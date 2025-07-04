@@ -92,7 +92,7 @@ const AttendanceCalendar = () => {
 
   const validateCurrentLocation = async (coords) => {
     try {
-      const response = await fetch('https://vsofthrms-production.up.railway.app/validate-location', {
+      const response = await fetch('https://hrms-three-tau.vercel.appvalidate-location', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -113,7 +113,7 @@ const AttendanceCalendar = () => {
 
   const fetchWorkLocations = async () => {
     try {
-      const response = await fetch('https://vsofthrms-production.up.railway.app/work-locations');
+      const response = await fetch('https://hrms-three-tau.vercel.appwork-locations');
       const result = await response.json();
       if (result.success) {
         setWorkLocations(result.data);
@@ -128,7 +128,7 @@ const AttendanceCalendar = () => {
     try {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1;
-      const response = await fetch(`https://vsofthrms-production.up.railway.app/api/attendance-with-location/${EMPLOYEE_ID}/${year}/${month}`);
+      const response = await fetch(`https://hrms-three-tau.vercel.appapi/attendance-with-location/${EMPLOYEE_ID}/${year}/${month}`);
       const result = await response.json();
       if (result.success) {
         setAttendanceData(result.data);

@@ -19,7 +19,7 @@ const InternLogin = () => {
   });
   const navigate = useNavigate();
   
-  const API_BASE_URL = 'https://vsofthrms-production.up.railway.app/api';
+  const API_BASE_URL = 'https://hrms-three-tau.vercel.appapi';
 
   const passwordRequirements = {
     minLength: 8,

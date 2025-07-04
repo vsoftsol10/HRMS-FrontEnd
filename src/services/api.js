@@ -2,6 +2,6 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: 'https://vsofthrms-production.up.railway.app/api',
+  baseURL: 'https://hrms-three-tau.vercel.appapi',
   headers: { 'Content-Type': 'application/json' }
 });

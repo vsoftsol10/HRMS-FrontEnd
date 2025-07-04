@@ -10,7 +10,7 @@ const CourseDashboard = () => {
   const [error, setError] = useState(null);
 
   // API base URL - adjust this to match your backend URL
-  const API_BASE_URL =  'https://vsofthrms-production.up.railway.app/api';
+  const API_BASE_URL =  'https://hrms-three-tau.vercel.appapi';
 
   // Fetch courses from backend
   const fetchCourses = async () => {

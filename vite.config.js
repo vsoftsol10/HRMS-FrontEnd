@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://vsofthrms-production.up.railway.app',
+        target: 'https://hrms-three-tau.vercel.app/',
         changeOrigin: true,
         secure: true,
       }

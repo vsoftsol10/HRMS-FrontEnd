@@ -12,7 +12,7 @@ const EmployeeLogin = () => {
   const navigate = useNavigate();
 
   // Hardcoded for immediate fix - replace with env var once working
-  const API_BASE_URL = 'https://vsofthrms-production.up.railway.app';
+  const API_BASE_URL = 'https://hrms-backend-production-abd6.up.railway.app/';
   
   // Debug logs
 //  console.log('Environment:', process.env.NODE_ENV);

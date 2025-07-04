@@ -9,7 +9,7 @@ const PayrollAdmin = () => {
  
   const fetchPayrollList = async () => {
     try {
-      const res = await fetch('https://hrms-three-tau.vercel.appapi/payroll');
+      const res = await fetch('https://hrms-backend-production-abd6.up.railway.appapi/payroll');
       const data = await res.json();
       setPayrolls(data);
     } catch (err) {
@@ -129,8 +129,8 @@ const PayrollAdmin = () => {
     e.preventDefault();
 
     const url = editingPayroll
-      ? `https://hrms-three-tau.vercel.appapi/payroll/${editingPayroll.id}`
-      : 'https://hrms-three-tau.vercel.appapi/payroll';
+      ? `https://hrms-backend-production-abd6.up.railway.appapi/payroll/${editingPayroll.id}`
+      : 'https://hrms-backend-production-abd6.up.railway.appapi/payroll';
 
     const method = editingPayroll ? 'PUT' : 'POST';
 
@@ -180,7 +180,7 @@ const PayrollAdmin = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this payroll?')) {
       try {
-        const res = await fetch(`https://hrms-three-tau.vercel.appapi/payroll/${id}`, {
+        const res = await fetch(`https://hrms-backend-production-abd6.up.railway.appapi/payroll/${id}`, {
           method: 'DELETE'
         });
 

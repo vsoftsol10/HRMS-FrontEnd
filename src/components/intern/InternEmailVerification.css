@@ -1,0 +1,210 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bitter:ital,wght@0,100..900;1,100..900&family=Edu+NSW+ACT+Hand+Pre:wght@400..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&family=Tagesschrift&display=swap");
+
+/* Intern Email Verification Component Styles */
+.iev-verification-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f6c1fd 0%, #f6c8fc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.iev-verification-card {
+  max-width: 28rem;
+  width: 100%;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Header Styles */
+.iev-header {
+  margin-bottom: 2rem;
+}
+
+.iev-icon-wrapper {
+  margin: 0 auto 1rem;
+  width: 4rem;
+  height: 4rem;
+  background-color: #edd1fa;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iev-mail-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #841a99;
+}
+
+.iev-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+  font-family: 'Bitter';
+}
+
+.iev-subtitle {
+  color: #6b7280;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: 'Satisfy';
+}
+
+/* Content Section */
+.iev-content-section {
+  margin-bottom: 2rem;
+}
+
+/* Loading State */
+.iev-loader-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #2563eb;
+  margin: 0 auto 1rem;
+  animation: iev-spin 1s linear infinite;
+}
+
+@keyframes iev-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.iev-loading-text {
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Success State */
+.iev-success-icon {
+  width: 4rem;
+  height: 4rem;
+  color: #10b981;
+  margin: 0 auto 1rem;
+}
+
+.iev-success-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #047857;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+/* Error State */
+.iev-error-icon {
+  width: 4rem;
+  height: 4rem;
+  
+  color: #ef4444;
+  margin: 0 auto 1rem;
+}
+
+.iev-error-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: 'Bebas+Neue';
+  color: #b91c1c;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+/* Message Text */
+.iev-message-text {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+}
+
+.iev-redirect-text {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* Button Styles */
+.iev-button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.iev-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.iev-btn-primary {
+  background-color: #872f92;
+  color: white;
+}
+
+.iev-btn-primary:hover {
+  background-color: #952da3;
+}
+
+.iev-btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.iev-btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+/* Footer Styles */
+.iev-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.iev-footer-text {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.iev-support-link {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.iev-support-link:hover {
+  color: #1d4ed8;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .iev-verification-container {
+    padding: 0.5rem;
+  }
+  
+  .iev-verification-card {
+    padding: 1.5rem;
+  }
+  
+  .iev-title {
+    font-size: 1.25rem;
+  }
+  
+  .iev-success-title,
+  .iev-error-title {
+    font-size: 1.125rem;
+  }
+}

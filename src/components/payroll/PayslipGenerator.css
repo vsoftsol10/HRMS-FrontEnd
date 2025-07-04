@@ -1,0 +1,567 @@
+/* PayslipGenerator.css */
+
+/* Overlay and Container */
+.payslip-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.payslip-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 1024px;
+  width: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Loading States */
+.loading-container {
+  background-color: white;
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.loading-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e5e7eb;
+  border-bottom: 2px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  color: #374151;
+}
+
+/* Error States */
+.error-container {
+  background-color: white;
+  border-radius: 8px;
+  padding: 32px;
+  max-width: 448px;
+  width: 100%;
+  margin: 0 16px;
+}
+
+.error-content {
+  text-align: center;
+}
+
+.error-icon {
+  color: #ef4444;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.error-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.error-message {
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.error-button {
+  padding: 8px 16px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.error-button:hover {
+  background-color: #4b5563;
+}
+
+/* Header */
+.payslip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.payslip-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.print-btn {
+  background-color: #2563eb;
+  color: white;
+}
+
+.print-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.download-btn {
+  background-color: #059669;
+  color: white;
+}
+
+.download-btn:hover {
+  background-color: #047857;
+}
+
+.email-btn {
+  background-color: #7c3aed;
+  color: white;
+}
+
+.email-btn:hover {
+  background-color: #6d28d9;
+}
+
+.close-btn {
+  background-color: #6b7280;
+  color: white;
+}
+
+.close-btn:hover {
+  background-color: #4b5563;
+}
+
+/* Payslip Content */
+.payslip-content {
+  padding: 32px;
+  background-color: white;
+  font-family: Arial, sans-serif;
+}
+
+/* Updated Company Header Design */
+.company-header-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #8B5A96 0%, #6A4C93 100%);
+  color: white;
+  padding: 25px 30px;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 0;
+  min-height: 80px;
+}
+
+.company-logo-section {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.company-logo {
+  width: 180px;
+  height: 80px;
+  background-color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.company-info {
+  flex: 1;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.company-address {
+  font-size: 14px;
+  opacity: 0.9;
+  max-width: 250px;
+  line-height: 1.4;
+}
+
+.company-contact {
+  font-size: 13px;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Remove the old logo-text and company-name styles */
+.logo-text {
+  display: none;
+}
+
+.company-name-new {
+  display: none;
+}
+
+/* Payslip Title Section */
+.payslip-title-section {
+  background-color: #f8f9fa;
+  text-align: center;
+  padding: 15px;
+  border: 2px solid #000;
+  border-top: none;
+  margin-bottom: 0;
+}
+
+.payslip-main-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+  color: #000;
+  letter-spacing: 1px;
+}
+
+/* Employee Information Table */
+.employee-info-table {
+  margin-bottom: 0;
+}
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  border-top: none;
+}
+
+.info-table td {
+  padding: 12px 15px;
+  border: 1px solid #000;
+  font-size: 14px;
+}
+
+.info-label {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  width: 25%;
+}
+
+.info-value {
+  background-color: white;
+  width: 25%;
+}
+
+/* Earnings and Deductions Table */
+.earnings-deductions-table {
+  margin-bottom: 0;
+}
+
+.payroll-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  border-top: none;
+}
+
+.payroll-table th {
+  padding: 12px 15px;
+  border: 1px solid #000;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.earnings-header {
+  background-color: #e8f5e8;
+  color: #2d5a2d;
+}
+
+.deductions-header {
+  background-color: #ffe8e8;
+  color: #5a2d2d;
+}
+
+.payroll-table td {
+  padding: 10px 15px;
+  border: 1px solid #000;
+  font-size: 14px;
+}
+
+.item-label {
+  background-color: #f8f9fa;
+  font-weight: 500;
+  width: 25%;
+}
+
+.amount-value {
+  background-color: white;
+  text-align: right;
+  font-weight: 500;
+  width: 25%;
+}
+
+.total-row {
+  background-color: #f0f0f0;
+}
+
+.total-label {
+  background-color: #e0e0e0 !important;
+  font-weight: bold;
+}
+
+.total-amount {
+  background-color: #e0e0e0 !important;
+  text-align: right;
+  font-weight: bold;
+}
+
+/* Net Salary Section */
+.net-salary-section {
+  margin-bottom: 0;
+}
+
+.net-salary-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  border-top: none;
+}
+
+.net-salary-table td {
+  padding: 15px;
+  border: 1px solid #000;
+  font-size: 16px;
+  text-align: center;
+  background-color: #f0f8ff;
+}
+
+.net-salary-label {
+  width: 50%;
+  font-weight: bold;
+}
+
+.net-salary-amount {
+  width: 50%;
+  font-weight: bold;
+  font-size: 18px;
+  color: #2563eb;
+}
+
+/* Footer */
+.payslip-footer-new {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.payslip-footer-new p {
+  margin: 4px 0;
+}
+
+.generated-date {
+  margin-top: 8px !important;
+  font-weight: 500;
+}
+
+/* Print Styles */
+@media print {
+  .payslip-overlay {
+    position: static;
+    background-color: transparent;
+    padding: 0;
+  }
+  
+  .payslip-container {
+    box-shadow: none;
+    max-height: none;
+    overflow: visible;
+    border-radius: 0;
+  }
+  
+  .payslip-header {
+    display: none;
+  }
+  
+  .payslip-content {
+    padding: 16px;
+  }
+  
+  .company-header-new {
+    margin-bottom: 0;
+    border-radius: 0;
+  }
+  
+  .payslip-footer-new {
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+  
+  /* Ensure table borders print correctly */
+  .info-table,
+  .payroll-table,
+  .net-salary-table {
+    border: 2px solid #000 !important;
+  }
+  
+  .info-table td,
+  .payroll-table th,
+  .payroll-table td,
+  .net-salary-table td {
+    border: 1px solid #000 !important;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .payslip-overlay {
+    padding: 8px;
+  }
+  
+  .payslip-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .action-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .payslip-content {
+    padding: 16px;
+  }
+  
+  .company-header-new {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .company-logo-section {
+    justify-content: center;
+  }
+  
+  .company-info {
+    text-align: center;
+    align-items: center;
+  }
+  
+  .company-address {
+    max-width: none;
+    text-align: center;
+  }
+  
+  .payslip-main-title {
+    font-size: 18px;
+  }
+  
+  /* Make tables more mobile-friendly */
+  .info-table,
+  .payroll-table,
+  .net-salary-table {
+    font-size: 12px;
+  }
+  
+  .info-table td,
+  .payroll-table th,
+  .payroll-table td,
+  .net-salary-table td {
+    padding: 8px 10px;
+  }
+  
+  .item-label,
+  .amount-value {
+    width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .company-header-new {
+    padding: 15px;
+  }
+  
+  .company-logo {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .payslip-main-title {
+    font-size: 16px;
+  }
+  
+  .info-table td,
+  .payroll-table th,
+  .payroll-table td,
+  .net-salary-table td {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  
+  .net-salary-amount {
+    font-size: 16px;
+  }
+  
+  .company-address {
+    font-size: 12px;
+  }
+  
+  .company-contact {
+    font-size: 11px;
+  }
+}

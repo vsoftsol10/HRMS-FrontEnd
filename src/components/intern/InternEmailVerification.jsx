@@ -7,7 +7,7 @@ const InternEmailVerification = () => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const API_BASE_URL = 'https://hrms-three-tau.vercel.appapi';
+  const API_BASE_URL = 'https://hrms-backend-production-abd6.up.railway.app/';
 
   useEffect(() => {
     const verifyEmail = async () => {

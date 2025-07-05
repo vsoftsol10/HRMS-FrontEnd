@@ -56,7 +56,7 @@ const fetchProfileData = async () => {
     setLoading(true);
     setError(null);
     
-    const response = await fetch(`https://hrms-backend-production-abd6.up.railway.app/api/profile/${employeeId}`); // Use employeeId from URL
+    const response = await fetch(`https://hrms-backend-production-abd6.up.railway.appapi/profile/${employeeId}`); // Use employeeId from URL
     
     if (!response.ok) {
       if (response.status === 404) {
@@ -81,7 +81,7 @@ const saveProfileData = async (updatedData) => {
   try {
     setSaving(true);
     
-    const response = await fetch(`https://hrms-backend-production-abd6.up.railway.app/api/profile/${employeeId}`, { // Use employeeId from URL
+    const response = await fetch(`https://hrms-backend-production-abd6.up.railway.appapi/profile/${employeeId}`, { // Use employeeId from URL
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

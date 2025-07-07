@@ -183,7 +183,7 @@ const InternLogin = () => {
     setErrors({});
     
     try {
-      const endpoint = isSignUp ? '/auth/register' : '/auth/login';
+      const endpoint = isSignUp ? '/api/auth/register' : '/api/auth/login';
       const payload = isSignUp 
         ? {
             email: formData.email,
@@ -283,7 +283,7 @@ const InternLogin = () => {
     setErrors({});
     
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -322,7 +322,7 @@ const InternLogin = () => {
     setErrors({});
     
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/resend-verification`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

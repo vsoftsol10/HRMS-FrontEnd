@@ -93,7 +93,7 @@ const PayslipGenerator = ({ payrollId, onClose }) => {
             <h3 className="error-title">Error</h3>
             <p className="error-message">{error}</p>
             <button onClick={onClose} className="error-button">
-              Close
+              X
             </button>
           </div>
         </div>
@@ -129,8 +129,8 @@ const PayslipGenerator = ({ payrollId, onClose }) => {
               <Mail className="btn-icon" />
               Email
             </button>
-            <button onClick={onClose} className="action-btn close-btn">
-              Close
+            <button onClick={onClose} className="action-btn-close-btn">
+              X
             </button>
           </div>
         </div>

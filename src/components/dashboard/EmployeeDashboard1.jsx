@@ -34,7 +34,7 @@ const EmployeeDashboard1 = () => {
     localStorage.removeItem('employeeInfo');
     
     // Redirect to login
-    navigate('/login');
+    navigate('/employee/login');
   };
 
   if (isLoading) {

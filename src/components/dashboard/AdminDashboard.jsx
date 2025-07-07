@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { User, Bell, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [currentUser] = useState('Admin'); // This would come from your auth context/state
+  const navigate=useNavigate();
   
   const handleLogout = () => {
     // In a real app, you would clear authentication tokens and redirect to login
     if (window.confirm('Are you sure you want to logout?')) {
       alert('Logged out successfully! Redirecting to login page...');
+      navigate('/')
+
       // window.location.href = '/login';
     }
   };

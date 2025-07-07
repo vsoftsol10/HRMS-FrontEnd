@@ -147,7 +147,7 @@ console.log('Using API_BASE_URL:', API_BASE_URL);
               {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
             
-            <div className="login-footer">
+            {/* <div className="login-footer">
               <button 
                 type="button" 
                 className="forgot-password"
@@ -155,7 +155,7 @@ console.log('Using API_BASE_URL:', API_BASE_URL);
               >
                 Forgot Password?
               </button>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>

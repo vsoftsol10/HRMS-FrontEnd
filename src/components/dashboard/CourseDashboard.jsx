@@ -18,7 +18,7 @@ const CourseDashboard = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE_URL}/courses`, {
+      const response = await fetch(`${API_BASE_URL}/api/courses`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

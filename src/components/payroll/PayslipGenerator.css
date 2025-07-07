@@ -92,7 +92,7 @@
 .error-button {
   padding: 8px 16px;
   background-color: #6b7280;
-  color: white;
+  color: rgb(192, 37, 37);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -138,6 +138,20 @@
   transition: background-color 0.2s;
 }
 
+.action-btn-close-btn{
+  color: red;
+  background-color: rgb(241, 177, 177);
+  padding: 15px;
+  height: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-right: 5px;
+  border-top-left-radius: 15px;
+  border-top-right-radius:  15px;
+
+}
+
+.action-btn-close-btn,
 .btn-icon {
   width: 16px;
   height: 16px;

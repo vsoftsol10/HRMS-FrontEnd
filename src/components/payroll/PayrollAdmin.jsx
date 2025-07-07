@@ -6,10 +6,11 @@ const PayrollAdmin = () => {
   const [payrolls, setPayrolls] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPayroll, setEditingPayroll] = useState(null);
+  const API_BASE_URL = "https://hrms-backend-production-abd6.up.railway.app";
  
   const fetchPayrollList = async () => {
     try {
-      const res = await fetch('https://hrms-backend-production-abd6.up.railway.app/api/payroll');
+      const res = await fetch(`${API_BASE_URL}/api/payroll`);
       const data = await res.json();
       setPayrolls(data);
     } catch (err) {
@@ -129,8 +130,8 @@ const PayrollAdmin = () => {
     e.preventDefault();
 
     const url = editingPayroll
-      ? `https://hrms-backend-production-abd6.up.railway.app/api/payroll/${editingPayroll.id}`
-      : 'https://hrms-backend-production-abd6.up.railway.app/api/payroll';
+      ? `${API_BASE_URL}/api/payroll/${editingPayroll.id}`
+      : `${API_BASE_URL}/api/payroll`;
 
     const method = editingPayroll ? 'PUT' : 'POST';
 
@@ -180,7 +181,7 @@ const PayrollAdmin = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this payroll?')) {
       try {
-        const res = await fetch(`https://hrms-backend-production-abd6.up.railway.app/api/payroll/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/payroll/${id}`, {
           method: 'DELETE'
         });
 

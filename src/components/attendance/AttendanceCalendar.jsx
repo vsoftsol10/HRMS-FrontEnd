@@ -128,7 +128,7 @@ const AttendanceCalendar = () => {
     try {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1;
-      const response = await fetch(`https://hrms-backend-production-abd6.up.railway.appapi/attendance-with-location/${EMPLOYEE_ID}/${year}/${month}`);
+      const response = await fetch(`https://hrms-backend-production-abd6.up.railway.app/api/attendance-with-location/${EMPLOYEE_ID}/${year}/${month}`);
       const result = await response.json();
       if (result.success) {
         setAttendanceData(result.data);

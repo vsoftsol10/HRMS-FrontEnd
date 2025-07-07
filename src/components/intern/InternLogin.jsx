@@ -18,8 +18,31 @@ const InternLogin = () => {
     fullName: '',
   });
   const navigate = useNavigate();
-  
+
   const API_BASE_URL = 'https://hrms-backend-production-abd6.up.railway.app';
+
+  const testCORSConnection = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/cors-test`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('CORS Test Success:', data);
+      return true;
+    } else {
+      console.error('CORS Test Failed:', response.status, response.statusText);
+      return false;
+    }
+  } catch (error) {
+    console.error('CORS Test Error:', error);
+    return false;
+  }
+};
 
   const passwordRequirements = {
     minLength: 8,
@@ -169,181 +192,197 @@ const InternLogin = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    console.log('Form submitted with data:', formData);
-    
-    if (!validateForm()) {
-      console.log('Form validation failed:', errors);
+  e.preventDefault();
+  
+  console.log('Form submitted with data:', formData);
+  
+  if (!validateForm()) {
+    console.log('Form validation failed:', errors);
+    return;
+  }
+  
+  setIsLoading(true);
+  setSuccessMessage('');
+  setErrors({});
+  
+  try {
+    // Test CORS first
+    const corsTest = await testCORSConnection();
+    if (!corsTest) {
+      setErrors({ submit: 'Unable to connect to server. Please try again later.' });
+      setIsLoading(false);
       return;
     }
-    
-    setIsLoading(true);
-    setSuccessMessage('');
-    setErrors({});
-    
-    try {
-      const endpoint = isSignUp ? '/api/auth/register' : '/api/auth/login';
-      const payload = isSignUp 
-        ? {
-            email: formData.email,
-            password: formData.password,
-            fullName: formData.fullName,
-          }
-        : {
-            email: formData.email,
-            password: formData.password
-          };
 
-      console.log('API URL:', `${API_BASE_URL}${endpoint}`);
-      console.log('Payload:', payload);
+    // Fixed endpoints - added /api prefix
+    const endpoint = isSignUp ? '/api/auth/register' : '/api/auth/login';
+    const payload = isSignUp 
+      ? {
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.fullName,
+        }
+      : {
+          email: formData.email,
+          password: formData.password
+        };
 
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
+    console.log('API URL:', `${API_BASE_URL}${endpoint}`);
+    console.log('Payload:', payload);
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
 
-      const data = await response.json();
-      console.log('Response data:', data);
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
-      if (response.ok) {
-        // Success
-        if (isSignUp) {
-          setSuccessMessage(data.message || 'Account created successfully! Please check your email for verification.');
-          // Clear form
-          setFormData({
-            email: '',
-            password: '',
-            confirmPassword: '',
-            fullName: '',
+    const data = await response.json();
+    console.log('Response data:', data);
+
+    if (response.ok) {
+      // Success
+      if (isSignUp) {
+        setSuccessMessage(data.message || 'Account created successfully! Please check your email for verification.');
+        // Clear form
+        setFormData({
+          email: '',
+          password: '',
+          confirmPassword: '',
+          fullName: '',
+        });
+      } else {
+        // Login success
+        setSuccessMessage(data.message || 'Login successful!');
+        // Store token if needed
+        if (data.token) {
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        // Redirect
+        navigate('/intern/dashboard');
+      }
+    } else {
+      // Handle different types of errors
+      if (data.details && Array.isArray(data.details)) {
+        // Validation errors from express-validator
+        const validationErrors = {};
+        data.details.forEach(detail => {
+          const field = detail.path || detail.param;
+          validationErrors[field] = detail.msg;
+        });
+        setErrors(validationErrors);
+      } else if (data.error) {
+        // Handle specific error cases
+        if (data.error === 'Please verify your email address before signing in') {
+          setErrors({ 
+            submit: data.error,
+            needsVerification: true // Flag to show resend button
           });
         } else {
-          // Login success
-          setSuccessMessage(data.message || 'Login successful!');
-          // Store token if needed
-          if (data.token) {
-            localStorage.setItem('authToken', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-          }
-          // Redirect
-          navigate('/intern/dashboard');
+          setErrors({ submit: data.error });
         }
       } else {
-        // Handle different types of errors
-        if (data.details && Array.isArray(data.details)) {
-          // Validation errors from express-validator
-          const validationErrors = {};
-          data.details.forEach(detail => {
-            const field = detail.path || detail.param;
-            validationErrors[field] = detail.msg;
-          });
-          setErrors(validationErrors);
-        } else if (data.error) {
-          // Handle specific error cases
-          if (data.error === 'Please verify your email address before signing in') {
-            setErrors({ 
-              submit: data.error,
-              needsVerification: true // Flag to show resend button
-            });
-          } else {
-            setErrors({ submit: data.error });
-          }
-        } else {
-          // Fallback error message
-          setErrors({ submit: 'An error occurred. Please try again.' });
-        }
+        // Fallback error message
+        setErrors({ submit: 'An error occurred. Please try again.' });
       }
-
-    } catch (error) {
-      console.error('Request failed:', error);
-      setErrors({ submit: 'Network error. Please check your connection and try again.' });
-    } finally {
-      setIsLoading(false);
     }
-  };
+
+  } catch (error) {
+    console.error('Request failed:', error);
+    
+    // More specific error handling
+    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      setErrors({ submit: 'Network error: Unable to connect to server. Please check your internet connection and try again.' });
+    } else {
+      setErrors({ submit: 'Network error. Please check your connection and try again.' });
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleForgotPassword = async () => {
-    if (!formData.email) {
-      setErrors({ email: 'Please enter your email address first' });
-      return;
-    }
-    
-    if (!validateEmail(formData.email)) {
-      setErrors({ email: 'Please enter a valid email address' });
-      return;
-    }
-    
-    setIsLoading(true);
-    setErrors({});
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: formData.email })
-      });
+  if (!formData.email) {
+    setErrors({ email: 'Please enter your email address first' });
+    return;
+  }
+  
+  if (!validateEmail(formData.email)) {
+    setErrors({ email: 'Please enter a valid email address' });
+    return;
+  }
+  
+  setIsLoading(true);
+  setErrors({});
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: formData.email })
+    });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        setSuccessMessage(data.message || 'Password reset link sent to your email!');
-      } else {
-        setErrors({ submit: data.error || 'Failed to send reset email. Please try again.' });
-      }
-    } catch (error) {
-      console.error('Forgot password failed:', error);
-      setErrors({ submit: 'Network error. Please try again.' });
-    } finally {
-      setIsLoading(false);
+    const data = await response.json();
+    
+    if (response.ok) {
+      setSuccessMessage(data.message || 'Password reset link sent to your email!');
+    } else {
+      setErrors({ submit: data.error || 'Failed to send reset email. Please try again.' });
     }
-  };
+  } catch (error) {
+    console.error('Forgot password failed:', error);
+    setErrors({ submit: 'Network error. Please try again.' });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-  // NEW: Add the handleResendVerification function
-  const handleResendVerification = async () => {
-    if (!formData.email) {
-      setErrors({ email: 'Please enter your email address first' });
-      return;
-    }
-    
-    if (!validateEmail(formData.email)) {
-      setErrors({ email: 'Please enter a valid email address' });
-      return;
-    }
-    
-    setIsLoading(true);
-    setErrors({});
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: formData.email })
-      });
+  // Updated handleResendVerification function  
+const handleResendVerification = async () => {
+  if (!formData.email) {
+    setErrors({ email: 'Please enter your email address first' });
+    return;
+  }
+  
+  if (!validateEmail(formData.email)) {
+    setErrors({ email: 'Please enter a valid email address' });
+    return;
+  }
+  
+  setIsLoading(true);
+  setErrors({});
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: formData.email })
+    });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        setSuccessMessage(data.message || 'Verification email sent! Please check your inbox.');
-      } else {
-        setErrors({ submit: data.error || 'Failed to send verification email. Please try again.' });
-      }
-    } catch (error) {
-      console.error('Resend verification failed:', error);
-      setErrors({ submit: 'Network error. Please try again.' });
-    } finally {
-      setIsLoading(false);
+    const data = await response.json();
+    
+    if (response.ok) {
+      setSuccessMessage(data.message || 'Verification email sent! Please check your inbox.');
+    } else {
+      setErrors({ submit: data.error || 'Failed to send verification email. Please try again.' });
     }
-  };
+  } catch (error) {
+    console.error('Resend verification failed:', error);
+    setErrors({ submit: 'Network error. Please try again.' });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleModeSwitch = () => {
     setIsSignUp(!isSignUp);

@@ -61,7 +61,7 @@ const AdminDashboard = () => {
               { name: 'Attendance' },
               { name: 'Leaves' },
               { name: 'Payroll', link: '/payrollAdmin' },
-              { name: 'Intern Portal' },
+              { name: 'Intern Portal',link: '/admin/intern' },
               { name: 'Settings' }
             ].map((item, index) => (
               <li key={item.name} style={{

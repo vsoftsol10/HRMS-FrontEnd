@@ -17,6 +17,7 @@ import CourseDashboard from './components/dashboard/CourseDashboard'
 import InternLogin from './components/intern/InternLogin'
 import InternEmailVerification from './components/intern/InternEmailVerification'
 import EmployeeDashboard1 from './components/dashboard/EmployeeDashboard1'
+import AdminIntern from './pages/AdminIntern'
 
 
 
@@ -35,7 +36,7 @@ const employeeCode = 'VSEMP03';
       <Route path='/dashboard' element={<InternPortal/>} />
       <Route path='/payslip/:id' element={<PayrollPage/>} />
       <Route path='/payrollAdmin' element={<PayrollAdmin/>} />
-
+      <Route path='/admin/intern' element={<AdminIntern/>} />
       <Route path='/verify-email' element={<InternEmailVerification />} />
       <Route path='/intern/login' element={<InternLogin/>} />
       <Route path='/intern/dashboard' element={<InternDashboardPage/>} />

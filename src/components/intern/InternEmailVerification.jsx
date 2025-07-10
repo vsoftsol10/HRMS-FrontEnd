@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, AlertCircle, Loader, Mail } from 'lucide-react';
 import './InternEmailVerification.css';
+import { useNavigate } from 'react-router-dom';
 
 const InternEmailVerification = () => {
   const [status, setStatus] = useState('verifying'); // 'verifying', 'success', 'error'
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const navigate=useNavigate();
 
   const API_BASE_URL = 'https://hrms-backend-production-abd6.up.railway.app';
 
@@ -23,7 +25,7 @@ const InternEmailVerification = () => {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/verify-email?token=${token}`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/verify-email?token=${token}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

@@ -248,7 +248,7 @@ const InternLogin = () => {
       // Success
       if (isSignUp) {
         setSuccessMessage(data.message || 'Account created successfully! Please check your email for verification.');
-        navigate('/intern/dashboard');
+       
 
         // Clear form
         setFormData({

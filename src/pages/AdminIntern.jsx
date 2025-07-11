@@ -193,7 +193,6 @@ const AdminIntern = () => {
   const renderInternManagement = () => (
     <div className="intern-management">
       <div className="management-header">
-        <h2>Intern Management</h2>
         <div className="search-filter-bar">
           <div className="search-box">
             <Search className="search-icon" />

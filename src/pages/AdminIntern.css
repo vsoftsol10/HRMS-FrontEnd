@@ -224,6 +224,7 @@ body {
   padding: 2rem;
   overflow-y: auto;
   animation: fadeInUp 0.6s ease-out;
+  width:100%
 }
 
 /* Dashboard Styles */
@@ -235,9 +236,12 @@ body {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+  width: 140%;
+  justify-content: center;
+  align-items: center;
 }
 
 .stat-card {
@@ -283,7 +287,7 @@ body {
   align-items: center;
   justify-content: center;
   color: var(--white);
-  animation: rotate 20s linear infinite;
+  /* animation: rotate 20s linear infinite; */
 }
 
 .stat-icon svg {
@@ -381,6 +385,7 @@ body {
 /* Intern Management Styles */
 .intern-management {
   animation: fadeInUp 0.6s ease-out;
+  width:140%
 }
 
 .management-header {
@@ -686,6 +691,7 @@ body {
 /* Task Management Styles */
 .task-management {
   animation: fadeInUp 0.6s ease-out;
+  width:140%
 }
 
 .task-list {
@@ -763,6 +769,7 @@ body {
 /* Resource Management Styles */
 .resource-management {
   animation: fadeInUp 0.6s ease-out;
+  width:140%
 }
 
 .resource-grid {
@@ -826,6 +833,8 @@ body {
 /* Attendance Management Styles */
 .attendance-management {
   animation: fadeInUp 0.6s ease-out;
+  align-items: center;
+  width: 140%;
 }
 
 .attendance-controls {

@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand+Pre:wght@400..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&family=Tagesschrift&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bitter:ital,wght@0,100..900;1,100..900&family=Edu+NSW+ACT+Hand+Pre:wght@400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&family=Tagesschrift&display=swap');
 
 * {
   margin: 0;
@@ -142,14 +141,14 @@ body {
   font-weight: 600;
   margin-bottom: 50px;
   position: relative;
-  font-family: 'Satisfy', cursive;
+  font-family: 'Lora', cursive;
 }
 
 
 .portal-section h2::after {
   content: '';
   position: absolute;
-  bottom: -15px;
+  bottom: -5px;
   left: 50%;
   transform: translateX(-50%);
   width: 80px;

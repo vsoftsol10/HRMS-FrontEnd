@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://hrms-backend-production-abd6.up.railway.app',
+        target: 'https://hrms-backend-5wau.onrender.com/',
         changeOrigin: true,
         secure: true,
       }

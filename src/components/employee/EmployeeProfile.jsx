@@ -52,7 +52,7 @@ const EmployeeProfile = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('https://hrms-backend-production-abd6.up.railway.app/api/employees');
+      const response = await fetch('https://hrms-backend-5wau.onrender.com//api/employees');
       const data = await response.json();
       setEmployees(data);
     } catch (error) {
@@ -65,9 +65,9 @@ const EmployeeProfile = () => {
   const fetchDropdownData = async () => {
     try {
       const [deptRes, posRes, manRes] = await Promise.all([
-        fetch('https://hrms-backend-production-abd6.up.railway.app/api/departments'),
-        fetch('https://hrms-backend-production-abd6.up.railway.app/api/positions'),
-        fetch('https://hrms-backend-production-abd6.up.railway.app/api/managers')
+        fetch('https://hrms-backend-5wau.onrender.com//api/departments'),
+        fetch('https://hrms-backend-5wau.onrender.com//api/positions'),
+        fetch('https://hrms-backend-5wau.onrender.com//api/managers')
       ]);
       
       const [deptData, posData, manData] = await Promise.all([
@@ -177,8 +177,8 @@ const EmployeeProfile = () => {
     
     try {
       const url = isEditing 
-        ? `https://hrms-backend-production-abd6.up.railway.app/api/employees/${currentEmployee.id}`
-        : 'https://hrms-backend-production-abd6.up.railway.app/api/employees';
+        ? `https://hrms-backend-5wau.onrender.com//api/employees/${currentEmployee.id}`
+        : 'https://hrms-backend-5wau.onrender.com//api/employees';
       
       const method = isEditing ? 'PUT' : 'POST';
       
@@ -208,7 +208,7 @@ const EmployeeProfile = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       try {
-        const response = await fetch(`https://hrms-backend-production-abd6.up.railway.app/api/employees/${id}`, {
+        const response = await fetch(`https://hrms-backend-5wau.onrender.com//api/employees/${id}`, {
           method: 'DELETE',
         });
 

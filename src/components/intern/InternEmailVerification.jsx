@@ -9,7 +9,7 @@ const InternEmailVerification = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate=useNavigate();
 
-  const API_BASE_URL = 'https://hrms-backend-production-abd6.up.railway.app';
+  const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com/';
 
   useEffect(() => {
     const verifyEmail = async () => {

@@ -10,7 +10,7 @@ const CourseDashboard = () => {
   const [error, setError] = useState(null);
 
   // API base URL - adjust this to match your backend URL
-  const API_BASE_URL =  'https://hrms-backend-5wau.onrender.com/';
+  const API_BASE_URL =  'https://hrms-backend-5wau.onrender.com';
 
   // Fetch courses from backend
   const fetchCourses = async () => {

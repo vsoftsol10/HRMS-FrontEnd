@@ -6,7 +6,7 @@ const PayrollAdmin = () => {
   const [payrolls, setPayrolls] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPayroll, setEditingPayroll] = useState(null);
-  const API_BASE_URL = "https://hrms-backend-5wau.onrender.com/";
+  const API_BASE_URL = "https://hrms-backend-5wau.onrender.com";
  
   const fetchPayrollList = async () => {
     try {

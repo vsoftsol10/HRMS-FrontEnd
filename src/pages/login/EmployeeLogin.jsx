@@ -12,7 +12,7 @@ const EmployeeLogin = () => {
   const navigate = useNavigate();
 
   // Hardcoded for immediate fix - replace with env var once working
-  const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com/';
+  const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com';
   
   // Debug logs
 //  console.log('Environment:', process.env.NODE_ENV);

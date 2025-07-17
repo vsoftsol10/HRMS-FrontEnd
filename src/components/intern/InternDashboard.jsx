@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CheckCircle, 
   Calendar, 
@@ -14,54 +14,201 @@ import {
   Download,
   Eye,
   Upload,
-  MessageCircle
+  MessageCircle,
+  AlertCircle,
+  Loader
 } from 'lucide-react';
-import './InternDashboard.css';
 
 const InternDashboard = () => {
   const [activeNav, setActiveNav] = useState('dashboard');
-  
-  // Sample data
-  const internData = {
-    name: "Alex Johnson",
-    profilePhoto: null,
-    trainingEndDate: "August 15, 2025",
-    tasksCompleted: 6,
-    totalTasks: 10,
-    daysRemaining: 14,
-    upcomingDeadline: "July 2 – Task 3",
-    certificateProgress: 80
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [internData, setInternData] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [timelineSteps, setTimelineSteps] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [submissionText, setSubmissionText] = useState('');
+  const [submissionFile, setSubmissionFile] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // API base URL - adjust according to your backend
+  const API_BASE_URL = 'http://localhost:5000/api';
+
+  // Get token from localStorage
+  const getToken = () => {
+    return localStorage.getItem('token');
   };
 
-  const tasks = [
-    { id: 1, title: "Complete Orientation Module", assignedDate: "2025-06-01", dueDate: "2025-06-05", status: "Approved" },
-    { id: 2, title: "Project Planning Document", assignedDate: "2025-06-06", dueDate: "2025-06-15", status: "Completed" },
-    { id: 3, title: "Mid-term Presentation", assignedDate: "2025-06-16", dueDate: "2025-07-02", status: "In Progress" },
-    { id: 4, title: "Code Review Session", assignedDate: "2025-06-20", dueDate: "2025-07-10", status: "Pending" },
-    { id: 5, title: "Final Project Submission", assignedDate: "2025-07-01", dueDate: "2025-08-01", status: "Pending" },
-  ];
+  // API call helper
+  const apiCall = async (endpoint, options = {}) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          ...options.headers,
+        },
+      });
 
-  const timelineSteps = [
-    { title: "Training Start", date: "June 1, 2025", status: "completed" },
-    { title: "Basic Tasks", date: "June 15, 2025", status: "completed" },
-    { title: "Mid-review", date: "July 15, 2025", status: "current" },
-    { title: "Final Project", date: "August 1, 2025", status: "upcoming" },
-    { title: "Certificate Issued", date: "August 15, 2025", status: "upcoming" }
-  ];
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Token expired or invalid
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-  const announcements = [
-    "Project submission deadline extended to July 5.",
-    "New training materials available in the resources section.",
-    "Monthly intern meet-up scheduled for July 20th."
-  ];
+      return await response.json();
+    } catch (error) {
+      console.error('API call error:', error);
+      throw error;
+    }
+  };
+
+  // Fetch dashboard data
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const data = await apiCall('/dashboard');
+      setInternData(data.internData);
+    } catch (error) {
+      setError('Failed to fetch dashboard data');
+      console.error('Dashboard fetch error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch tasks
+  const fetchTasks = async () => {
+    try {
+      const data = await apiCall('/tasks');
+      setTasks(data);
+    } catch (error) {
+      setError('Failed to fetch tasks');
+      console.error('Tasks fetch error:', error);
+    }
+  };
+
+  // Fetch announcements
+  const fetchAnnouncements = async () => {
+    try {
+      const data = await apiCall('/announcements');
+      setAnnouncements(data);
+    } catch (error) {
+      setError('Failed to fetch announcements');
+      console.error('Announcements fetch error:', error);
+    }
+  };
+
+  // Fetch timeline
+  const fetchTimeline = async () => {
+    try {
+      const data = await apiCall('/timeline');
+      setTimelineSteps(data);
+    } catch (error) {
+      setError('Failed to fetch timeline');
+      console.error('Timeline fetch error:', error);
+    }
+  };
+
+  // Submit task
+  const submitTask = async (taskId) => {
+    try {
+      setSubmitting(true);
+      const formData = new FormData();
+      formData.append('submissionText', submissionText);
+      if (submissionFile) {
+        formData.append('file', submissionFile);
+      }
+
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/tasks/${taskId}/submit`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit task');
+      }
+
+      // Refresh tasks after submission
+      await fetchTasks();
+      await fetchDashboardData();
+      setSelectedTask(null);
+      setSubmissionText('');
+      setSubmissionFile(null);
+      alert('Task submitted successfully!');
+    } catch (error) {
+      setError('Failed to submit task');
+      console.error('Task submission error:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Download certificate
+  const downloadCertificate = async () => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/certificate/download`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Certificate not available');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'certificate.pdf';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert('Certificate not available for download yet');
+    }
+  };
+
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
+
+  // Load data on component mount
+  useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+
+    fetchDashboardData();
+    fetchTasks();
+    fetchAnnouncements();
+    fetchTimeline();
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Pending': return 'intern-dash-status-pending';
-      case 'In Progress': return 'intern-dash-status-in-progress';
-      case 'Completed': return 'intern-dash-status-completed';
-      case 'Approved': return 'intern-dash-status-approved';
-      default: return 'intern-dash-status-pending';
+      case 'Pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'In Progress': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Completed': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Submitted': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'Approved': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -75,125 +222,171 @@ const InternDashboard = () => {
     { id: 'logout', icon: LogOut, label: 'Logout' }
   ];
 
-  return (
-    <div className="intern-dash-container">
-      {/* Sidebar */}
-      <div className="intern-dash-sidebar">
-        <div className="intern-dash-sidebar-header">
-          <h2 className="intern-dash-sidebar-title">Intern Portal</h2>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center space-x-2">
+          <Loader className="animate-spin" size={24} />
+          <span>Loading dashboard...</span>
         </div>
-        <nav className="intern-dash-sidebar-nav">
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <AlertCircle className="mx-auto text-red-500 mb-4" size={48} />
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Dashboard</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-lg flex flex-col">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-800">Intern Portal</h2>
+        </div>
+        <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveNav(item.id)}
-              className={`intern-dash-nav-item ${activeNav === item.id ? 'intern-dash-nav-item-active' : ''}`}
+              onClick={() => item.id === 'logout' ? handleLogout() : setActiveNav(item.id)}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                activeNav === item.id 
+                  ? 'bg-blue-100 text-blue-700 font-medium' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
             >
-              <item.icon className="intern-dash-nav-icon" />
-              {item.label}
+              <item.icon size={20} />
+              <span>{item.label}</span>
             </button>
           ))}
         </nav>
       </div>
 
       {/* Main Content */}
-      <div className="intern-dash-main-content">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Welcome Banner */}
-        <div className="intern-dash-welcome-banner">
-          <div className="intern-dash-welcome-content">
-            <div className="intern-dash-profile-avatar">
-              {internData.profilePhoto ? (
-                <img src={internData.profilePhoto} alt="Profile" className="intern-dash-profile-image" />
-              ) : (
-                internData.name.split(' ').map(n => n[0]).join('')
-              )}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-lg font-bold">
+              {internData?.name?.split(' ').map(n => n[0]).join('') || 'IN'}
             </div>
-            <div className="intern-dash-welcome-text">
-              <h1 className="intern-dash-welcome-title">Welcome, {internData.name}!</h1>
-              <p className="intern-dash-welcome-subtitle">Your training ends on: {internData.trainingEndDate}</p>
+            <div>
+              <h1 className="text-2xl font-bold">Welcome, {internData?.name || 'Intern'}!</h1>
+              <p className="text-blue-100">Your training ends on: {internData?.trainingEndDate || 'Not set'}</p>
             </div>
           </div>
         </div>
 
-        <div className="intern-dash-content-wrapper">
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto p-6">
           {/* Quick Stats Cards */}
-          <div className="intern-dash-stats-grid">
-            <div className="intern-dash-stat-card intern-dash-stat-card-primary">
-              <div className="intern-dash-stat-content">
-                <div className="intern-dash-stat-info">
-                  <h3 className="intern-dash-stat-title">Tasks Completed</h3>
-                  <p className="intern-dash-stat-value">{internData.tasksCompleted} of {internData.totalTasks}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600">Tasks Completed</h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {internData?.tasksCompleted || 0} of {internData?.totalTasks || 0}
+                  </p>
                 </div>
-                <CheckCircle className="intern-dash-stat-icon" />
+                <CheckCircle className="text-green-500" size={24} />
               </div>
             </div>
 
-            <div className="intern-dash-stat-card intern-dash-stat-card-secondary">
-              <div className="intern-dash-stat-content">
-                <div className="intern-dash-stat-info">
-                  <h3 className="intern-dash-stat-title">Days Remaining</h3>
-                  <p className="intern-dash-stat-value">{internData.daysRemaining} Days Left</p>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600">Days Remaining</h3>
+                  <p className="text-2xl font-bold text-gray-900">{internData?.daysRemaining || 0} Days</p>
                 </div>
-                <Calendar className="intern-dash-stat-icon" />
+                <Calendar className="text-blue-500" size={24} />
               </div>
             </div>
 
-            <div className="intern-dash-stat-card intern-dash-stat-card-tertiary">
-              <div className="intern-dash-stat-content">
-                <div className="intern-dash-stat-info">
-                  <h3 className="intern-dash-stat-title">Upcoming Deadline</h3>
-                  <p className="intern-dash-stat-value-small">{internData.upcomingDeadline}</p>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600">Upcoming Deadline</h3>
+                  <p className="text-sm font-medium text-gray-900">
+                    {internData?.upcomingDeadline || 'No upcoming deadlines'}
+                  </p>
                 </div>
-                <Clock className="intern-dash-stat-icon" />
+                <Clock className="text-orange-500" size={24} />
               </div>
             </div>
 
-            <div className="intern-dash-stat-card intern-dash-stat-card-neutral">
-              <div className="intern-dash-stat-content">
-                <div className="intern-dash-stat-info">
-                  <h3 className="intern-dash-stat-title">Certificate Progress</h3>
-                  <p className="intern-dash-stat-value">{internData.certificateProgress}% Complete</p>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600">Certificate Progress</h3>
+                  <p className="text-2xl font-bold text-gray-900">{internData?.certificateProgress || 0}%</p>
                 </div>
-                <Award className="intern-dash-stat-icon" />
+                <Award className="text-purple-500" size={24} />
               </div>
             </div>
           </div>
 
-          <div className="intern-dash-main-grid">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Task Status Table */}
-            <div className="intern-dash-task-section">
-              <div className="intern-dash-card">
-                <h2 className="intern-dash-section-title">Task Status</h2>
-                <div className="intern-dash-table-wrapper">
-                  <table className="intern-dash-task-table">
-                    <thead>
-                      <tr className="intern-dash-table-header">
-                        <th className="intern-dash-table-cell">Task Title</th>
-                        <th className="intern-dash-table-cell">Assigned Date</th>
-                        <th className="intern-dash-table-cell">Due Date</th>
-                        <th className="intern-dash-table-cell">Status</th>
-                        <th className="intern-dash-table-cell">Action</th>
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-800">Task Status</h2>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Task Title</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-200">
                       {tasks.map((task) => (
-                        <tr key={task.id} className="intern-dash-table-row">
-                          <td className="intern-dash-table-cell">{task.title}</td>
-                          <td className="intern-dash-table-cell">{task.assignedDate}</td>
-                          <td className="intern-dash-table-cell">{task.dueDate}</td>
-                          <td className="intern-dash-table-cell">
-                            <span className={`intern-dash-status-badge ${getStatusColor(task.status)}`}>
+                        <tr key={task.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 text-sm text-gray-900">{task.title}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{task.assignedDate}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{task.dueDate}</td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(task.status)}`}>
                               {task.status}
                             </span>
                           </td>
-                          <td className="intern-dash-table-cell">
-                            <div className="intern-dash-action-buttons">
-                              <button className="intern-dash-action-btn intern-dash-action-btn-view">
-                                <Eye className="intern-dash-action-icon" />
+                          <td className="px-6 py-4">
+                            <div className="flex space-x-2">
+                              <button 
+                                onClick={() => setSelectedTask(task)}
+                                className="text-blue-600 hover:text-blue-800"
+                                title="View Details"
+                              >
+                                <Eye size={16} />
                               </button>
-                              <button className="intern-dash-action-btn intern-dash-action-btn-upload">
-                                <Upload className="intern-dash-action-icon" />
-                              </button>
+                              {task.status === 'Pending' && (
+                                <button 
+                                  onClick={() => setSelectedTask(task)}
+                                  className="text-green-600 hover:text-green-800"
+                                  title="Submit Task"
+                                >
+                                  <Upload size={16} />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -204,91 +397,214 @@ const InternDashboard = () => {
               </div>
             </div>
 
-            {/* Right Column */}
-            <div className="intern-dash-sidebar-content">
+            {/* Right Sidebar */}
+            <div className="space-y-6">
               {/* Announcements */}
-              <div className="intern-dash-announcements-card">
-                <h2 className="intern-dash-card-title">📢 Announcements</h2>
-                <div className="intern-dash-announcements-list">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-800">📢 Announcements</h2>
+                </div>
+                <div className="p-6 space-y-4">
                   {announcements.map((announcement, index) => (
-                    <div key={index} className="intern-dash-announcement-item">
-                      <p className="intern-dash-announcement-text">{announcement}</p>
+                    <div key={index} className="text-sm text-gray-600 p-3 bg-blue-50 rounded-lg">
+                      {announcement}
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Certificate Section */}
-              <div className="intern-dash-card">
-                <h2 className="intern-dash-card-title">🎓 Certificate</h2>
-                <div className="intern-dash-certificate-content">
-                  <div className="intern-dash-progress-info">
-                    <span className="intern-dash-progress-label">Progress</span>
-                    <span className="intern-dash-progress-percentage">{internData.certificateProgress}%</span>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-800">🎓 Certificate</h2>
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-sm text-gray-600">Progress</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {internData?.certificateProgress || 0}%
+                    </span>
                   </div>
-                  <div className="intern-dash-progress-bar">
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
                     <div 
-                      className="intern-dash-progress-fill"
-                      style={{ width: `${internData.certificateProgress}%` }}
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${internData?.certificateProgress || 0}%` }}
                     ></div>
                   </div>
+                  <button 
+                    onClick={downloadCertificate}
+                    disabled={internData?.certificateProgress !== 100}
+                    className={`w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                      internData?.certificateProgress === 100 
+                        ? 'bg-green-600 text-white hover:bg-green-700' 
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    <Download size={16} />
+                    <span>Download Certificate</span>
+                  </button>
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Complete all tasks to unlock your certificate
+                  </p>
                 </div>
-                <button 
-                  className={`intern-dash-certificate-btn ${internData.certificateProgress === 100 ? 'intern-dash-certificate-btn-active' : 'intern-dash-certificate-btn-disabled'}`}
-                  disabled={internData.certificateProgress !== 100}
-                >
-                  <Download className="intern-dash-btn-icon" />
-                  <span>Download Certificate</span>
-                </button>
-                <p className="intern-dash-certificate-note">
-                  Complete all tasks to unlock your certificate
-                </p>
               </div>
 
               {/* Help & Support */}
-              <div className="intern-dash-card">
-                <h2 className="intern-dash-card-title">💬 Help & Support</h2>
-                <div className="intern-dash-help-links">
-                  <a href="mailto:info@thevsoft.com" className="intern-dash-help-link">
-                    📧 info@thevsoft.com
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-800">💬 Help & Support</h2>
+                </div>
+                <div className="p-6">
+                  <a 
+                    href="mailto:info@thevsoft.com" 
+                    className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 mb-4"
+                  >
+                    <span>📧</span>
+                    <span>info@thevsoft.com</span>
                   </a>
-                  {/* <button className="intern-dash-help-link intern-dash-help-button">
-                    📚 FAQ / Help Docs
-                  </button>
-                  <button className="intern-dash-help-link intern-dash-help-button intern-dash-chat-button">
-                    <MessageCircle className="intern-dash-help-icon" />
+                  <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
+                    <MessageCircle size={16} />
                     <span>Live Chat</span>
-                  </button> */}
+                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Training Progress Timeline */}
-          <div className="intern-dash-timeline-section">
-            <div className="intern-dash-card">
-              <h2 className="intern-dash-section-title">🛣️ Training Progress Timeline</h2>
-              <div className="intern-dash-timeline-container">
-                {timelineSteps.map((step, index) => (
-                  <div key={index} className="intern-dash-timeline-step">
-                    <div className={`intern-dash-timeline-circle ${
-                      step.status === 'completed' ? 'intern-dash-timeline-completed' : 
-                      step.status === 'current' ? 'intern-dash-timeline-current' : 'intern-dash-timeline-upcoming'
-                    }`}>
-                      {index + 1}
+          <div className="mt-8">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800">🛣️ Training Progress Timeline</h2>
+              </div>
+              <div className="p-6">
+                <div className="flex flex-wrap justify-between items-center space-y-4 md:space-y-0">
+                  {timelineSteps.map((step, index) => (
+                    <div key={index} className="flex flex-col items-center space-y-2 relative">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                        step.status === 'completed' 
+                          ? 'bg-green-500 text-white' 
+                          : step.status === 'current' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-gray-200 text-gray-500'
+                      }`}>
+                        {index + 1}
+                      </div>
+                      <div className="text-center">
+                        <h3 className="text-sm font-medium text-gray-800">{step.title}</h3>
+                        <p className="text-xs text-gray-500">{step.date}</p>
+                      </div>
+                      {index < timelineSteps.length - 1 && (
+                        <div className="hidden md:block absolute top-4 left-full w-16 h-0.5 bg-gray-200 transform translate-x-4"></div>
+                      )}
                     </div>
-                    <h3 className="intern-dash-timeline-title">{step.title}</h3>
-                    <p className="intern-dash-timeline-date">{step.date}</p>
-                    {index < timelineSteps.length - 1 && (
-                      <div className="intern-dash-timeline-connector"></div>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Task Details Modal */}
+      {selectedTask && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800">{selectedTask.title}</h2>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Task Description
+                  </label>
+                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                    {selectedTask.description || 'No description provided'}
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Due Date
+                    </label>
+                    <p className="text-sm text-gray-600">{selectedTask.dueDate}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(selectedTask.status)}`}>
+                      {selectedTask.status}
+                    </span>
+                  </div>
+                </div>
+
+                {selectedTask.feedback && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Feedback
+                    </label>
+                    <p className="text-sm text-gray-600 bg-yellow-50 p-3 rounded-lg">
+                      {selectedTask.feedback}
+                    </p>
+                  </div>
+                )}
+
+                {selectedTask.status === 'Pending' && (
+                  <div className="border-t pt-4">
+                    <h3 className="text-lg font-medium text-gray-800 mb-4">Submit Task</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Submission Text
+                        </label>
+                        <textarea
+                          value={submissionText}
+                          onChange={(e) => setSubmissionText(e.target.value)}
+                          rows={4}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter your submission details..."
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Upload File (Optional)
+                        </label>
+                        <input
+                          type="file"
+                          onChange={(e) => setSubmissionFile(e.target.files[0])}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+              <button
+                onClick={() => setSelectedTask(null)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Close
+              </button>
+              {selectedTask.status === 'Pending' && (
+                <button
+                  onClick={() => submitTask(selectedTask.id)}
+                  disabled={submitting || !submissionText.trim()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                >
+                  {submitting && <Loader className="animate-spin" size={16} />}
+                  <span>{submitting ? 'Submitting...' : 'Submit Task'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

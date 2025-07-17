@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bitter:ital,wght@0,100..900;1,100..900&family=Edu+NSW+ACT+Hand+Pre:wght@400..700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&family=Tagesschrift&display=swap');
 /* AdminIntern.css - Professional Admin Panel Styles */
 
 /* CSS Variables for Color Scheme */
@@ -178,6 +179,8 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-family: 'Bitter';
+
 }
 
 .header-actions {
@@ -305,7 +308,8 @@ body {
 
 .stat-info p {
   color: var(--dark-gray);
-  font-weight: 500;
+  font-weight: 600;
+  font-family: "Edu NSW ACT Hand Precursive";
 }
 
 .dashboard-charts {
@@ -684,8 +688,9 @@ body {
 
 .section-header h2 {
   color: var(--primary-color);
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 500;
+  font-family: "Lora";
 }
 
 /* Task Management Styles */

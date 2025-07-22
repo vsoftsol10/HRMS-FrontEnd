@@ -21,15 +21,16 @@ const InternLogin = () => {
 
   const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com';
 
-  const testCORSConnection = async () => {
+const testCORSConnection = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/cors-test`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include' // include if cookies/auth needed
     });
-    
+
     if (response.ok) {
       const data = await response.json();
       console.log('CORS Test Success:', data);
@@ -43,6 +44,7 @@ const InternLogin = () => {
     return false;
   }
 };
+
 
   const passwordRequirements = {
     minLength: 8,

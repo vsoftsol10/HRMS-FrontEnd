@@ -11,6 +11,7 @@ const EmployeeProfile = () => {
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
   const [managers, setManagers] = useState([]);
+  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     employeeCode: '',
@@ -52,11 +53,31 @@ const EmployeeProfile = () => {
 
   const fetchEmployees = async () => {
     try {
+      setError(null);
       const response = await fetch('https://hrms-backend-5wau.onrender.com/api/employees');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      
+      // Handle case where API returns error object instead of array
+      if (data.error || data.message) {
+        throw new Error(data.message || data.error || 'Unknown error occurred');
+      }
+      
+      // Ensure data is an array
+      if (!Array.isArray(data)) {
+        console.error('Expected array but got:', typeof data, data);
+        throw new Error('Invalid data format received from server');
+      }
+      
       setEmployees(data);
     } catch (error) {
       console.error('Error fetching employees:', error);
+      setError(error.message);
+      setEmployees([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -70,17 +91,29 @@ const EmployeeProfile = () => {
         fetch('https://hrms-backend-5wau.onrender.com/api/managers')
       ]);
       
+      // Check if all requests were successful
+      const responses = [deptRes, posRes, manRes];
+      const allSuccessful = responses.every(res => res.ok);
+      
+      if (!allSuccessful) {
+        console.warn('Some dropdown data requests failed');
+      }
+      
       const [deptData, posData, manData] = await Promise.all([
-        deptRes.json(),
-        posRes.json(),
-        manRes.json()
+        deptRes.ok ? deptRes.json() : [],
+        posRes.ok ? posRes.json() : [],
+        manRes.ok ? manRes.json() : []
       ]);
 
-      setDepartments(deptData);
-      setPositions(posData);
-      setManagers(manData);
+      setDepartments(Array.isArray(deptData) ? deptData : []);
+      setPositions(Array.isArray(posData) ? posData : []);
+      setManagers(Array.isArray(manData) ? manData : []);
     } catch (error) {
       console.error('Error fetching dropdown data:', error);
+      // Set empty arrays as fallback
+      setDepartments([]);
+      setPositions([]);
+      setManagers([]);
     }
   };
 
@@ -140,7 +173,7 @@ const EmployeeProfile = () => {
       firstName: employee.firstName || '',
       middleName: employee.middleName || '',
       lastName: employee.lastName || '',
-      dateOfBirth: employee.dateOfBirth || '',
+      dateOfBirth: employee.dateOfBirth ? employee.dateOfBirth.split('T')[0] : '',
       gender: employee.gender || '',
       maritalStatus: employee.maritalStatus || '',
       nationality: employee.nationality || '',
@@ -159,9 +192,9 @@ const EmployeeProfile = () => {
       departmentId: employee.departmentId || '',
       positionId: employee.positionId || '',
       managerId: employee.managerId || '',
-      hireDate: employee.hireDate || '',
-      probationEndDate: employee.probationEndDate || '',
-      confirmationDate: employee.confirmationDate || '',
+      hireDate: employee.hireDate ? employee.hireDate.split('T')[0] : '',
+      probationEndDate: employee.probationEndDate ? employee.probationEndDate.split('T')[0] : '',
+      confirmationDate: employee.confirmationDate ? employee.confirmationDate.split('T')[0] : '',
       employmentType: employee.employmentType || 'full-time',
       workLocation: employee.workLocation || 'office',
       status: employee.status || 'active',
@@ -171,6 +204,12 @@ const EmployeeProfile = () => {
     setIsEditing(true);
     setShowModal(true);
   };
+const cleanFormData = {
+  ...formData,
+  departmentId: formData.departmentId || null,
+  positionId: formData.positionId || null,
+  managerId: formData.managerId || null
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -187,11 +226,11 @@ const EmployeeProfile = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(cleanFormData),
       });
 
       if (response.ok) {
-        fetchEmployees();
+        await fetchEmployees(); // Refresh the employee list
         setShowModal(false);
         resetForm();
         alert(isEditing ? 'Employee updated successfully!' : 'Employee added successfully!');
@@ -201,7 +240,7 @@ const EmployeeProfile = () => {
       }
     } catch (error) {
       console.error('Error saving employee:', error);
-      alert('Error saving employee');
+      alert('Error saving employee: ' + error.message);
     }
   };
 
@@ -213,27 +252,43 @@ const EmployeeProfile = () => {
         });
 
         if (response.ok) {
-          fetchEmployees();
+          await fetchEmployees(); // Refresh the employee list
           alert('Employee deleted successfully!');
         } else {
-          alert('Error deleting employee');
+          const error = await response.json();
+          alert(error.message || 'Error deleting employee');
         }
       } catch (error) {
         console.error('Error deleting employee:', error);
-        alert('Error deleting employee');
+        alert('Error deleting employee: ' + error.message);
       }
     }
   };
 
-  const filteredEmployees = employees.filter(employee =>
-    employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.employeeCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.departmentName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.positionTitle?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredEmployees = employees.filter(employee => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (employee.fullName && employee.fullName.toLowerCase().includes(searchLower)) ||
+      (employee.employeeCode && employee.employeeCode.toLowerCase().includes(searchLower)) ||
+      (employee.departmentName && employee.departmentName.toLowerCase().includes(searchLower)) ||
+      (employee.positionTitle && employee.positionTitle.toLowerCase().includes(searchLower))
+    );
+  });
 
   if (loading) {
     return <div className="loading">Loading employees...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <h2>Error Loading Employees</h2>
+        <p>{error}</p>
+        <button onClick={fetchEmployees} className="retry-btn">
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -262,13 +317,16 @@ const EmployeeProfile = () => {
           <div key={employee.id} className="employee-card">
             <div className="employee-card-header">
               <div className="employee-avatar">
-                {employee.firstName.charAt(0)}{employee.lastName.charAt(0)}
+                {employee.firstName && employee.lastName 
+                  ? `${employee.firstName.charAt(0)}${employee.lastName.charAt(0)}`
+                  : '??'
+                }
               </div>
               <div className="employee-info">
-                <h3>{employee.fullName}</h3>
-                <p className="employee-code">{employee.employeeCode}</p>
-                <span className={`status-badge ${employee.status}`}>
-                  {employee.status}
+                <h3>{employee.fullName || 'N/A'}</h3>
+                <p className="employee-code">{employee.employeeCode || 'N/A'}</p>
+                <span className={`status-badge ${employee.status || 'unknown'}`}>
+                  {employee.status || 'unknown'}
                 </span>
               </div>
             </div>
@@ -296,7 +354,7 @@ const EmployeeProfile = () => {
               </div>
               <div className="detail-row">
                 <span className="label">Employment Type:</span>
-                <span>{employee.employmentType}</span>
+                <span>{employee.employmentType || 'N/A'}</span>
               </div>
             </div>
 

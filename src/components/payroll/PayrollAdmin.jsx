@@ -234,11 +234,11 @@ const PayrollAdmin = () => {
   };
 
   return (
-    <div className="payroll-admin">
+    <div className="vsoft-payroll-admin-container">
       {/* Header */}
-      <div className="header">
-        <div className="header-content">
-          <div className="header-left">
+      <div className="vsoft-payroll-header">
+        <div className="vsoft-payroll-header-content">
+          <div className="vsoft-payroll-header-left">
             <Building size={32} />
             <div>
               <h1>VSoft Solutions</h1>
@@ -247,7 +247,7 @@ const PayrollAdmin = () => {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="add-button"
+            className="vsoft-payroll-add-button"
           >
             <Plus size={20} />
             Add New Payroll
@@ -256,29 +256,29 @@ const PayrollAdmin = () => {
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div className="vsoft-payroll-main-content">
         {/* Stats Cards */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-content">
-              <div className="stat-icon">
+        <div className="vsoft-payroll-stats-grid">
+          <div className="vsoft-payroll-stat-card">
+            <div className="vsoft-payroll-stat-content">
+              <div className="vsoft-payroll-stat-icon">
                 <Users size={24} />
               </div>
               <div>
-                <p className="stat-label">Total Employees</p>
-                <h3 className="stat-value">{payrolls.length}</h3>
+                <p className="vsoft-payroll-stat-label">Total Employees</p>
+                <h3 className="vsoft-payroll-stat-value">{payrolls.length}</h3>
               </div>
             </div>
           </div>
           
-          <div className="stat-card">
-            <div className="stat-content">
-              <div className="stat-icon">
+          <div className="vsoft-payroll-stat-card">
+            <div className="vsoft-payroll-stat-content">
+              <div className="vsoft-payroll-stat-icon">
                 <DollarSign size={24} />
               </div>
               <div>
-                <p className="stat-label">Total Payroll</p>
-                <h3 className="stat-value">
+                <p className="vsoft-payroll-stat-label">Total Payroll</p>
+                <h3 className="vsoft-payroll-stat-value">
                   ₹{payrolls.reduce((sum, p) => sum + calculateTotal(p.salary, p.deductions), 0).toLocaleString()}
                 </h3>
               </div>
@@ -287,13 +287,13 @@ const PayrollAdmin = () => {
         </div>
 
         {/* Payroll List */}
-        <div className="payroll-list-container">
-          <div className="payroll-list-header">
+        <div className="vsoft-payroll-list-container">
+          <div className="vsoft-payroll-list-header">
             <h2>Employee Payrolls</h2>
           </div>
           
-          <div className="table-wrapper">
-            <table className="payroll-table">
+          <div className="vsoft-payroll-table-wrapper">
+            <table className="vsoft-payroll-table">
               <thead>
                 <tr>
                   <th>Employee</th>
@@ -314,29 +314,29 @@ const PayrollAdmin = () => {
                   return (
                     <tr key={payroll.id}>
                       <td>
-                        <div className="employee-info">
-                          <div className="employee-name" style={{color:"#333"}}>{payroll.employee.name}</div>
-                          <div className="employee-id" >{payroll.employee.employeeId}</div>
+                        <div className="vsoft-payroll-employee-info">
+                          <div className="vsoft-payroll-employee-name">{payroll.employee.name}</div>
+                          <div className="vsoft-payroll-employee-id">{payroll.employee.employeeId}</div>
                         </div>
                       </td>
                       <td>{payroll.employee.position}</td>
                       <td>
                         {new Date(payroll.payPeriod.start).toLocaleDateString()} - {new Date(payroll.payPeriod.end).toLocaleDateString()}
                       </td>
-                      <td className="gross-salary">₹{grossSalary.toLocaleString()}</td>
-                      <td className="deductions">₹{totalDeductions.toLocaleString()}</td>
-                      <td className="net-salary">₹{netSalary.toLocaleString()}</td>
+                      <td className="vsoft-payroll-gross-salary">₹{grossSalary.toLocaleString()}</td>
+                      <td className="vsoft-payroll-deductions">₹{totalDeductions.toLocaleString()}</td>
+                      <td className="vsoft-payroll-net-salary">₹{netSalary.toLocaleString()}</td>
                       <td>
-                        <div className="action-buttons">
+                        <div className="vsoft-payroll-action-buttons">
                           <button
                             onClick={() => handleEdit(payroll)}
-                            className="edit-button"
+                            className="vsoft-payroll-edit-button"
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={() => handleDelete(payroll.id)}
-                            className="delete-button"
+                            className="vsoft-payroll-delete-button"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -353,24 +353,24 @@ const PayrollAdmin = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
+        <div className="vsoft-payroll-modal-overlay">
+          <div className="vsoft-payroll-modal">
+            <div className="vsoft-payroll-modal-header">
               <h2>{editingPayroll ? 'Edit Payroll' : 'Add New Payroll'}</h2>
-              <button onClick={closeModal} className="close-button">
+              <button onClick={closeModal} className="vsoft-payroll-close-button">
                 <X size={24} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="modal-form">
+            <form onSubmit={handleSubmit} className="vsoft-payroll-modal-form">
               {/* Pay Period Section */}
-              <div className="form-section">
-                <h3 className="section-title">
+              <div className="vsoft-payroll-form-section">
+                <h3 className="vsoft-payroll-section-title">
                   <Calendar size={20} />
                   Pay Period
                 </h3>
-                <div className="form-grid">
-                  <div className="form-field">
+                <div className="vsoft-payroll-form-grid">
+                  <div className="vsoft-payroll-form-field">
                     <label>Start Date</label>
                     <input
                       type="date"
@@ -379,7 +379,7 @@ const PayrollAdmin = () => {
                       required
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>End Date</label>
                     <input
                       type="date"
@@ -388,7 +388,7 @@ const PayrollAdmin = () => {
                       required
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>Pay Date</label>
                     <input
                       type="date"
@@ -401,13 +401,13 @@ const PayrollAdmin = () => {
               </div>
 
               {/* Employee Section */}
-              <div className="form-section">
-                <h3 className="section-title">
+              <div className="vsoft-payroll-form-section">
+                <h3 className="vsoft-payroll-section-title">
                   <Users size={20} />
                   Employee Details
                 </h3>
-                <div className="form-grid">
-                  <div className="form-field">
+                <div className="vsoft-payroll-form-grid">
+                  <div className="vsoft-payroll-form-field">
                     <label>Employee Name</label>
                     <input
                       type="text"
@@ -416,7 +416,7 @@ const PayrollAdmin = () => {
                       required
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>Employee ID</label>
                     <input
                       type="text"
@@ -425,7 +425,7 @@ const PayrollAdmin = () => {
                       required
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>Position</label>
                     <input
                       type="text"
@@ -434,7 +434,7 @@ const PayrollAdmin = () => {
                       required
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>Email</label>
                     <input
                       type="email"
@@ -447,13 +447,13 @@ const PayrollAdmin = () => {
               </div>
 
               {/* Salary Section */}
-              <div className="form-section">
-                <h3 className="section-title">
+              <div className="vsoft-payroll-form-section">
+                <h3 className="vsoft-payroll-section-title">
                   <DollarSign size={20} />
                   Salary Details
                 </h3>
-                <div className="form-grid">
-                  <div className="form-field">
+                <div className="vsoft-payroll-form-grid">
+                  <div className="vsoft-payroll-form-field">
                     <label>Basic Salary (₹)</label>
                     <input
                       type="number"
@@ -462,7 +462,7 @@ const PayrollAdmin = () => {
                       required
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>Overtime (₹)</label>
                     <input
                       type="number"
@@ -470,7 +470,7 @@ const PayrollAdmin = () => {
                       onChange={(e) => handleInputChange('salary', 'overtime', e.target.value)}
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>Bonus (₹)</label>
                     <input
                       type="number"
@@ -478,7 +478,7 @@ const PayrollAdmin = () => {
                       onChange={(e) => handleInputChange('salary', 'bonus', e.target.value)}
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>Allowances (₹)</label>
                     <input
                       type="number"
@@ -490,10 +490,10 @@ const PayrollAdmin = () => {
               </div>
 
               {/* Deductions Section */}
-              <div className="form-section">
-                <h3 className="section-title">Deductions</h3>
-                <div className="form-grid">
-                  <div className="form-field">
+              <div className="vsoft-payroll-form-section">
+                <h3 className="vsoft-payroll-section-title">Deductions</h3>
+                <div className="vsoft-payroll-form-grid">
+                  <div className="vsoft-payroll-form-field">
                     <label>Leave Deduction (₹)</label>
                     <input
                       type="number"
@@ -501,7 +501,7 @@ const PayrollAdmin = () => {
                       onChange={(e) => handleInputChange('deductions', 'LeaveDeduction', e.target.value)}
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>LOP Deduction (₹)</label>
                     <input
                       type="number"
@@ -509,7 +509,7 @@ const PayrollAdmin = () => {
                       onChange={(e) => handleInputChange('deductions', 'LOP_Deduction', e.target.value)}
                     />
                   </div>
-                  <div className="form-field">
+                  <div className="vsoft-payroll-form-field">
                     <label>Late Deduction (₹)</label>
                     <input
                       type="number"
@@ -521,12 +521,12 @@ const PayrollAdmin = () => {
               </div>
 
               {/* Form Actions */}
-              <div className="form-actions">
-                <button type="button" onClick={closeModal} className="cancel-button">
+              <div className="vsoft-payroll-form-actions">
+                <button type="button" onClick={closeModal} className="vsoft-payroll-cancel-button">
                   <X size={16} />
                   Cancel
                 </button>
-                <button type="submit" className="submit-button">
+                <button type="submit" className="vsoft-payroll-submit-button">
                   <Save size={16} />
                   {editingPayroll ? 'Update' : 'Save'} Payroll
                 </button>

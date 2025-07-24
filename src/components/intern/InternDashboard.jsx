@@ -33,7 +33,7 @@ const InternDashboard = () => {
   const [submitting, setSubmitting] = useState(false);
 
   // API base URL - adjust according to your backend
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com/api';
 
   // Get token from localStorage
   const getToken = () => {

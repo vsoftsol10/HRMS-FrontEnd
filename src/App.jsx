@@ -6,7 +6,6 @@ import PayrollPage from './pages/PayrollPage'
 import InternDashboardPage from './pages/InternDashboardPage'
 import PayrollAdmin from './components/payroll/PayrollAdmin'
 import AdminDashboard from './components/dashboard/AdminDashboard'
-import InternPortal from './components/dashboard/InternPortal'
 import LandingPage from './components/LandingPage/LandingPage'
 import EmployeeLogin from './pages/login/EmployeeLogin'
 import AdminLogin from './pages/login/AdminLogin'
@@ -18,7 +17,7 @@ import InternLogin from './components/intern/InternLogin'
 import InternEmailVerification from './components/intern/InternEmailVerification'
 import EmployeeDashboard1 from './components/dashboard/EmployeeDashboard1'
 import AdminIntern from './pages/AdminIntern'
-import InternDashboard from './components/intern/InternDashboard'
+import NotFoundPage from './pages/NotFoundPage'
 
 
 
@@ -34,7 +33,6 @@ const employeeCode = 'VSEMP03';
       <Route path="/profile/:employeeId" element={<MyProfile />} />
       <Route path='/employee/profile' element={<EmployeeProfile/>} />
       <Route path='/employee/calendar' element={<AttendanceCalendar/>} />
-      <Route path='/dashboard' element={<InternPortal/>} />
       <Route path='/payslip/:id' element={<PayrollPage/>} />
       <Route path='/payrollAdmin' element={<PayrollAdmin/>} />
       <Route path='/admin/intern' element={<AdminIntern/>} />
@@ -42,7 +40,7 @@ const employeeCode = 'VSEMP03';
       <Route path='/intern/login' element={<InternLogin/>} />
       <Route path='/intern/dashboard' element={<InternDashboardPage/>} />
       <Route path='/learn/course' element={<CourseDashboard/>} />
-      <Route path="*" element={<h1>404 - Page Not Found</h1>} />
+      <Route path="*" element={<NotFoundPage/>} />
 
     </Routes>
   )

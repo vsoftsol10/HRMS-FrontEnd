@@ -40,7 +40,7 @@ const employeeCode = 'VSEMP03';
       <Route path='/admin/intern' element={<AdminIntern/>} />
       <Route path='/verify-email' element={<InternEmailVerification />} />
       <Route path='/intern/login' element={<InternLogin/>} />
-      <Route path='/intern/dashboard' element={<InternDashboard/>} />
+      <Route path='/intern/dashboard' element={<InternDashboardPage/>} />
       <Route path='/learn/course' element={<CourseDashboard/>} />
       <Route path="*" element={<h1>404 - Page Not Found</h1>} />
 

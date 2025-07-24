@@ -245,32 +245,46 @@ const testCORSConnection = async () => {
 
     const data = await response.json();
     console.log('Response data:', data);
-
-    if (response.ok) {
-      // Success
-      if (isSignUp) {
-        setSuccessMessage(data.message || 'Account created successfully! Please check your email for verification.');
-       
-
-        // Clear form
-        setFormData({
-          email: '',
-          password: '',
-          confirmPassword: '',
-          fullName: '',
-        });
-      } else {
-        // Login success
-        setSuccessMessage(data.message || 'Login successful!');
-        // Store token if needed
-        if (data.token) {
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-        // Redirect
-        navigate('/intern/dashboard');
-      }
-    } else {
+if (response.ok) {
+  // Success
+  console.log('✅ Login/Signup successful!');
+  
+  if (isSignUp) {
+    console.log('📝 Sign up success');
+    setSuccessMessage(data.message || 'Account created successfully! Please check your email for verification.');
+    
+    // Clear form
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      fullName: '',
+    });
+  } else {
+    // Login success
+    console.log('🔐 Login success');
+    console.log('📊 Response data:', data);
+    
+    setSuccessMessage(data.message || 'Login successful!');
+    
+    // Store token if needed
+    if (data.token) {
+      console.log("💾 Storing token...");
+      localStorage.setItem('token', data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      console.log("✅ Token stored");
+    }
+    
+    // Add a small delay to ensure state updates
+    setTimeout(() => {
+      console.log('🚀 Navigating to /intern/dashboard...');
+      navigate('/intern/dashboard');
+      console.log('✅ Navigation called');
+    }, 100);
+  }
+} else {
+  console.log('❌ Response not ok:', response.status, response.statusText);
+  console.log('📊 Error data:', data);
       // Handle different types of errors
       if (data.details && Array.isArray(data.details)) {
         // Validation errors from express-validator

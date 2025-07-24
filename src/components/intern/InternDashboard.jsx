@@ -57,7 +57,7 @@ const InternDashboard = () => {
         if (response.status === 401) {
           // Token expired or invalid
           localStorage.removeItem('token');
-          window.location.href = '/login';
+          window.location.href = '/intern/login';
           return;
         }
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -184,14 +184,14 @@ const InternDashboard = () => {
   // Logout
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    window.location.href = '/intern/login';
   };
 
   // Load data on component mount
   useEffect(() => {
     const token = getToken();
     if (!token) {
-      window.location.href = '/login';
+      window.location.href = '/intern/login';
       return;
     }
 

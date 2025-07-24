@@ -18,6 +18,7 @@ import InternLogin from './components/intern/InternLogin'
 import InternEmailVerification from './components/intern/InternEmailVerification'
 import EmployeeDashboard1 from './components/dashboard/EmployeeDashboard1'
 import AdminIntern from './pages/AdminIntern'
+import InternDashboard from './components/intern/InternDashboard'
 
 
 
@@ -39,8 +40,9 @@ const employeeCode = 'VSEMP03';
       <Route path='/admin/intern' element={<AdminIntern/>} />
       <Route path='/verify-email' element={<InternEmailVerification />} />
       <Route path='/intern/login' element={<InternLogin/>} />
-      <Route path='/intern/dashboard' element={<InternDashboardPage/>} />
+      <Route path='/intern/dashboard' element={<InternDashboard/>} />
       <Route path='/learn/course' element={<CourseDashboard/>} />
+      <Route path="*" element={<h1>404 - Page Not Found</h1>} />
 
     </Routes>
   )

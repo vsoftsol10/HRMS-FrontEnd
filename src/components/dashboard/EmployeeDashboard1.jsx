@@ -17,7 +17,7 @@ const EmployeeDashboard1 = () => {
       setIsLoading(false);
     } else {
       // Redirect to login if not authenticated
-      navigate('/login');
+      navigate('/employee/login');
     }
   }, [navigate]);
 

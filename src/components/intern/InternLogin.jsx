@@ -19,8 +19,8 @@ const InternLogin = () => {
   });
   const navigate = useNavigate();
 
-  const API_BASE_URL = process.env.NODE_ENV === 'development' 
-  ? '' // Use relative URLs in development (proxy will handle it)
+const API_BASE_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:8080' // Use relative URLs in development (proxy will handle it)
   : 'https://hrms-backend-5wau.onrender.com'; 
 
 // In your InternLogin.jsx
@@ -28,12 +28,17 @@ const testCORSConnection = async () => {
   try {
     console.log("🧪 Testing CORS connection...");
     
-    const response = await fetch('/api/cors-test', {  // Changed to relative URL
+    // Use the full URL in production
+    const url = process.env.NODE_ENV === 'development' 
+      ? '/api/cors-test' 
+      : `${API_BASE_URL}/api/cors-test`;
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
+      credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit', // No credentials for cross-origin in production
     });
     
     if (!response.ok) {
@@ -45,7 +50,8 @@ const testCORSConnection = async () => {
     return data;
   } catch (error) {
     console.error("❌ CORS Test Error:", error);
-    throw error;
+    // Don't throw error in production - just return false
+    return false;
   }
 };
 
@@ -220,26 +226,19 @@ const testCORSConnection = async () => {
     }
 
     // Fixed endpoints - added /api prefix
-    const endpoint = isSignUp ? '/api/auth/register' : '/api/auth/login';
-    const payload = isSignUp 
-      ? {
-          email: formData.email,
-          password: formData.password,
-          fullName: formData.fullName,
-        }
-      : {
-          email: formData.email,
-          password: formData.password
-        };
+    const url = process.env.NODE_ENV === 'development' 
+  ? endpoint 
+  : `${API_BASE_URL}${endpoint}`;
 
-    console.log('API URL:', `${API_BASE_URL}${endpoint}`);
-    console.log('Payload:', payload);
+console.log('API URL:', url);
+console.log('Payload:', payload);
 
-  const response = await fetch('/api/auth/login', {  // Relative URL
+  const response = await fetch(url, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
   },
+  credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit',
   body: JSON.stringify(payload)
 });
 
@@ -343,11 +342,17 @@ if (response.ok) {
   setErrors({});
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    // Use proper URL construction
+    const url = process.env.NODE_ENV === 'development' 
+      ? '/api/auth/forgot-password'
+      : `${API_BASE_URL}/api/auth/forgot-password`;
+      
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit',
       body: JSON.stringify({ email: formData.email })
     });
 
@@ -382,11 +387,17 @@ const handleResendVerification = async () => {
   setErrors({});
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
+    // Use proper URL construction
+    const url = process.env.NODE_ENV === 'development' 
+      ? '/api/auth/resend-verification'
+      : `${API_BASE_URL}/api/auth/resend-verification`;
+      
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit',
       body: JSON.stringify({ email: formData.email })
     });
 

@@ -26,33 +26,7 @@ const API_BASE_URL = process.env.NODE_ENV === 'development'
 // In your InternLogin.jsx
 const testCORSConnection = async () => {
   // Only test CORS in development, and make it non-blocking
-  if (process.env.NODE_ENV !== 'development') {
-    return true; // Skip in production
-  }
-  
-  try {
-    console.log("🧪 Testing CORS connection...");
-    
-    const response = await fetch('/api/cors-test', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      console.warn("CORS test failed, but continuing...");
-      return false;
-    }
-    
-    const data = await response.json();
-    console.log("✅ CORS Test Success:", data);
-    return true;
-  } catch (error) {
-    console.warn("CORS test failed:", error.message);
-    return false; // Don't block the main request
-  }
+ return true
 };
 
   const passwordRequirements = {
@@ -369,17 +343,14 @@ const testCORSConnection = async () => {
   setErrors({});
   
   try {
-    // Use proper URL construction
-    const url = process.env.NODE_ENV === 'development' 
-      ? '/api/auth/forgot-password'
-      : `${API_BASE_URL}/api/auth/forgot-password`;
+    const url = `${API_BASE_URL}/api/auth/forgot-password`;
       
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit',
+      mode: 'cors',
       body: JSON.stringify({ email: formData.email })
     });
 
@@ -414,17 +385,14 @@ const handleResendVerification = async () => {
   setErrors({});
   
   try {
-    // Use proper URL construction
-    const url = process.env.NODE_ENV === 'development' 
-      ? '/api/auth/resend-verification'
-      : `${API_BASE_URL}/api/auth/resend-verification`;
+    const url = `${API_BASE_URL}/api/auth/resend-verification`;
       
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit',
+      mode: 'cors',
       body: JSON.stringify({ email: formData.email })
     });
 

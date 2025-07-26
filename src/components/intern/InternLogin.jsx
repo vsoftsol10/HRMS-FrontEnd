@@ -214,9 +214,8 @@ const testCORSConnection = async () => {
     }
 
     // Construct the URL properly
-    const url = process.env.NODE_ENV === 'development' 
-      ? endpoint  // This will use your proxy
-      : `${API_BASE_URL}${endpoint}`;
+   const url = `${API_BASE_URL}${endpoint}`;
+
 
     console.log('API URL:', url);
     console.log('Payload:', payload);

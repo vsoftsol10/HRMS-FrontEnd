@@ -19,32 +19,35 @@ const InternLogin = () => {
   });
   const navigate = useNavigate();
 
-  const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com';
+  const API_BASE_URL = process.env.NODE_ENV === 'development' 
+  ? '' // Use relative URLs in development (proxy will handle it)
+  : 'https://hrms-backend-5wau.onrender.com'; 
 
+// In your InternLogin.jsx
 const testCORSConnection = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/cors-test`, {
+    console.log("🧪 Testing CORS connection...");
+    
+    const response = await fetch('/api/cors-test', {  // Changed to relative URL
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include' // include if cookies/auth needed
+      credentials: 'include',
     });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('CORS Test Success:', data);
-      return true;
-    } else {
-      console.error('CORS Test Failed:', response.status, response.statusText);
-      return false;
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    
+    const data = await response.json();
+    console.log("✅ CORS Test Success:", data);
+    return data;
   } catch (error) {
-    console.error('CORS Test Error:', error);
-    return false;
+    console.error("❌ CORS Test Error:", error);
+    throw error;
   }
 };
-
 
   const passwordRequirements = {
     minLength: 8,
@@ -232,13 +235,13 @@ const testCORSConnection = async () => {
     console.log('API URL:', `${API_BASE_URL}${endpoint}`);
     console.log('Payload:', payload);
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
-    });
+  const response = await fetch('/api/auth/login', {  // Relative URL
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(payload)
+});
 
     console.log('Response status:', response.status);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));

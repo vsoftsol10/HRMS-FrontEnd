@@ -16,236 +16,612 @@ import {
   Upload,
   MessageCircle,
   AlertCircle,
-  Loader
+  Loader,
+  RefreshCw,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 
 const InternDashboard = () => {
-  const [activeNav, setActiveNav] = useState('dashboard');
+  const [activeNav, setActiveNav] = useState("dashboard");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('checking');
   const [internData, setInternData] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [timelineSteps, setTimelineSteps] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [submissionText, setSubmissionText] = useState('');
+  const [submissionText, setSubmissionText] = useState("");
   const [submissionFile, setSubmissionFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // API base URL - adjust according to your backend
-  const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com/api';
+  // Enhanced API configuration with multiple fallback options
+  const getApiConfig = () => {
+    const isDevelopment = process.env.NODE_ENV === "development";
+    
+    const configs = [
+      // Primary: Proxy in development, direct production URL in production
+      {
+        name: 'Primary',
+        baseUrl: isDevelopment ? '/api' : 'https://hrms-backend-5wau.onrender.com/api',
+        description: isDevelopment ? 'Development proxy' : 'Production server'
+      },
+      // Fallback 1: Always try direct production URL
+      {
+        name: 'Direct Production',
+        baseUrl: 'https://hrms-backend-5wau.onrender.com/api',
+        description: 'Direct production server connection'
+      },
+ 
+    ];
+
+    return configs;
+  };
 
   // Get token from localStorage
   const getToken = () => {
-    return localStorage.getItem('token');
+    return localStorage.getItem("token");
   };
 
-  // API call helper
-  const apiCall = async (endpoint, options = {}) => {
-    try {
-      const token = getToken();
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          ...options.headers,
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          // Token expired or invalid
-          localStorage.removeItem('token');
-          window.location.href = '/intern/login';
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
+  const validateAuth = () => {
+    const token = getToken();
+    if (!token) {
+      console.warn('No authentication token found');
+      // Don't redirect immediately in development for testing
+      if (process.env.NODE_ENV !== 'development') {
+        window.location.href = '/intern/login';
       }
+      return false;
+    }
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && payload.exp < Date.now() / 1000) {
+        console.warn('Token expired');
+        localStorage.removeItem('token');
+        if (process.env.NODE_ENV !== 'development') {
+          window.location.href = '/intern/login';
+        }
+        return false;
+      }
+    } catch (e) {
+      console.warn('Invalid token format:', e);
+      return process.env.NODE_ENV === 'development'; // Allow in dev for testing
+    }
+    
+    return true;
+  };
 
-      return await response.json();
+  // Enhanced API call with multiple fallback attempts
+  const apiCall = async (endpoint, options = {}) => {
+    const configs = getApiConfig();
+    let lastError = null;
+    
+    console.log(`🔄 Attempting API call to ${endpoint}`);
+    
+    for (let i = 0; i < configs.length; i++) {
+      const config = configs[i];
+      
+      try {
+        console.log(`📡 Trying ${config.name}: ${config.baseUrl}${endpoint}`);
+        
+        const token = getToken();
+        const url = `${config.baseUrl}${endpoint}`;
+        
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+            // Add CORS headers for direct requests
+            'Accept': 'application/json',
+            ...options.headers,
+          },
+          // Add timeout
+          signal: AbortSignal.timeout(10000), // 10 second timeout
+        });
+
+        console.log(`📊 Response from ${config.name}:`, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.warn('Authentication failed');
+            localStorage.removeItem('token');
+            if (process.env.NODE_ENV !== 'development') {
+              window.location.href = '/intern/login';
+            }
+            throw new Error('Authentication failed');
+          }
+          
+          // Try to get error message from response
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+              const errorData = await response.json();
+              errorMessage = errorData.message || errorMessage;
+            } else {
+              // If we get HTML, it might be an error page
+              const text = await response.text();
+              if (text.includes('<html>')) {
+                errorMessage = `Server returned HTML instead of JSON (${response.status}). Backend might be down.`;
+              }
+            }
+          } catch (parseError) {
+            console.warn('Could not parse error response:', parseError);
+          }
+          
+          throw new Error(errorMessage);
+        }
+
+        // Validate JSON response
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error(`Expected JSON but received: ${contentType || 'unknown'}`);
+        }
+
+        const data = await response.json();
+        console.log(`✅ Success with ${config.name}:`, data);
+        
+        // Update connection status on successful call
+        setConnectionStatus('connected');
+        
+        return data;
+
+      } catch (error) {
+        console.error(`❌ Failed with ${config.name}:`, error);
+        lastError = error;
+        
+        // Don't try other configs for auth errors
+        if (error.message.includes('Authentication failed')) {
+          break;
+        }
+        
+        // Continue to next config
+        continue;
+      }
+    }
+    
+    // All configs failed
+    setConnectionStatus('disconnected');
+    
+    // Provide helpful error message based on the last error
+    if (lastError.name === 'TypeError' && lastError.message.includes('fetch')) {
+      throw new Error('🔌 Cannot connect to server. Please check your internet connection and try again.');
+    }
+    
+    if (lastError.name === 'AbortError') {
+      throw new Error('⏱️ Request timed out. The server might be slow or down.');
+    }
+    
+    if (lastError.message.includes('CORS')) {
+      throw new Error('🚫 CORS error. Backend server configuration issue.');
+    }
+    
+    throw new Error(`🚨 All connection attempts failed. Last error: ${lastError.message}`);
+  };
+
+  // Test API connectivity
+  const testConnection = async () => {
+    try {
+      setConnectionStatus('checking');
+      console.log('🔍 Testing API connectivity...');
+      
+      // Try a simple health check or the dashboard endpoint
+      await apiCall('/dashboard');
+      
+      setConnectionStatus('connected');
+      console.log('✅ API connection successful');
+      return true;
     } catch (error) {
-      console.error('API call error:', error);
-      throw error;
+      console.error('❌ API connection failed:', error);
+      setConnectionStatus('disconnected');
+      return false;
     }
   };
 
-  // Fetch dashboard data
+  // Enhanced data fetching with better error handling
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const data = await apiCall('/dashboard');
-      setInternData(data.internData);
+      setError(null);
+      
+      console.log('📊 Fetching dashboard data...');
+      const data = await apiCall("/dashboard");
+      
+      if (data) {
+        setInternData(data.internData || data);
+        console.log('✅ Dashboard data loaded:', data);
+      }
     } catch (error) {
-      setError('Failed to fetch dashboard data');
-      console.error('Dashboard fetch error:', error);
+      const errorMsg = `Failed to fetch dashboard data: ${error.message}`;
+      setError(errorMsg);
+      console.error("Dashboard fetch error:", error);
+      
+      // Set mock data in development for testing UI
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔧 Setting mock data for development');
+        setInternData({
+          name: "Test Intern",
+          trainingEndDate: "2025-08-25",
+          tasksCompleted: 3,
+          totalTasks: 5,
+          daysRemaining: 45,
+          upcomingDeadline: "Project Review - Aug 1",
+          certificateProgress: 60
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch tasks
   const fetchTasks = async () => {
     try {
-      const data = await apiCall('/tasks');
-      setTasks(data);
+      console.log('📋 Fetching tasks...');
+      const data = await apiCall("/tasks");
+      
+      if (data) {
+        setTasks(Array.isArray(data) ? data : []);
+        console.log('✅ Tasks loaded:', data);
+      }
     } catch (error) {
-      setError('Failed to fetch tasks');
-      console.error('Tasks fetch error:', error);
+      const errorMsg = `Failed to fetch tasks: ${error.message}`;
+      setError(errorMsg);
+      console.error("Tasks fetch error:", error);
+      
+      // Set mock data in development
+      if (process.env.NODE_ENV === 'development') {
+        setTasks([
+          {
+            id: 1,
+            title: "Complete React Tutorial",
+            assignedDate: "2025-07-20",
+            dueDate: "2025-07-30",
+            status: "Pending",
+            description: "Complete the React fundamentals tutorial and submit your project."
+          },
+          {
+            id: 2,
+            title: "API Documentation Review",
+            assignedDate: "2025-07-22",
+            dueDate: "2025-08-01",
+            status: "In Progress",
+            description: "Review and provide feedback on the API documentation."
+          }
+        ]);
+      }
     }
   };
 
-  // Fetch announcements
   const fetchAnnouncements = async () => {
     try {
-      const data = await apiCall('/announcements');
-      setAnnouncements(data);
+      console.log('📢 Fetching announcements...');
+      const data = await apiCall("/announcements");
+      
+      if (data) {
+        setAnnouncements(Array.isArray(data) ? data : []);
+        console.log('✅ Announcements loaded:', data);
+      }
     } catch (error) {
-      setError('Failed to fetch announcements');
-      console.error('Announcements fetch error:', error);
+      const errorMsg = `Failed to fetch announcements: ${error.message}`;
+      console.error("Announcements fetch error:", error);
+      
+      // Set mock data in development
+      if (process.env.NODE_ENV === 'development') {
+        setAnnouncements([
+          "🎉 Welcome to the internship program!",
+          "📚 New learning resources available in the portal",
+          "⏰ Weekly standup meetings every Monday at 10 AM"
+        ]);
+      }
     }
   };
 
-  // Fetch timeline
   const fetchTimeline = async () => {
     try {
-      const data = await apiCall('/timeline');
-      setTimelineSteps(data);
+      console.log('📅 Fetching timeline...');
+      const data = await apiCall("/timeline");
+      
+      if (data) {
+        setTimelineSteps(Array.isArray(data) ? data : []);
+        console.log('✅ Timeline loaded:', data);
+      }
     } catch (error) {
-      setError('Failed to fetch timeline');
-      console.error('Timeline fetch error:', error);
+      const errorMsg = `Failed to fetch timeline: ${error.message}`;
+      console.error("Timeline fetch error:", error);
+      
+      // Set mock data in development
+      if (process.env.NODE_ENV === 'development') {
+        setTimelineSteps([
+          { title: "Onboarding", date: "Week 1", status: "completed" },
+          { title: "Training Phase 1", date: "Week 2-4", status: "completed" },
+          { title: "Project Work", date: "Week 5-8", status: "current" },
+          { title: "Final Review", date: "Week 9", status: "pending" },
+          { title: "Completion", date: "Week 10", status: "pending" }
+        ]);
+      }
     }
   };
 
-  // Submit task
+  // File upload with enhanced error handling
+  const apiCallWithFile = async (endpoint, formData) => {
+    try {
+      const token = getToken();
+      const configs = getApiConfig();
+      
+      for (const config of configs) {
+        try {
+          const response = await fetch(`${config.baseUrl}${endpoint}`, {
+            method: "POST",
+            headers: {
+              ...(token && { Authorization: `Bearer ${token}` }),
+            },
+            body: formData,
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              localStorage.removeItem("token");
+              if (process.env.NODE_ENV !== 'development') {
+                window.location.href = "/intern/login";
+              }
+              throw new Error('Authentication failed');
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          return await response.json();
+        } catch (error) {
+          console.error(`File upload failed with ${config.name}:`, error);
+          if (config === configs[configs.length - 1]) {
+            throw error;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("File upload error:", error);
+      throw error;
+    }
+  };
+
+  // Submit task with better error handling
   const submitTask = async (taskId) => {
     try {
       setSubmitting(true);
       const formData = new FormData();
-      formData.append('submissionText', submissionText);
+      formData.append("submissionText", submissionText);
       if (submissionFile) {
-        formData.append('file', submissionFile);
+        formData.append("file", submissionFile);
       }
 
-      const token = getToken();
-      const response = await fetch(`${API_BASE_URL}/tasks/${taskId}/submit`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      await apiCallWithFile(`/tasks/${taskId}/submit`, formData);
 
-      if (!response.ok) {
-        throw new Error('Failed to submit task');
-      }
+      // Refresh data after submission
+      await Promise.all([fetchTasks(), fetchDashboardData()]);
 
-      // Refresh tasks after submission
-      await fetchTasks();
-      await fetchDashboardData();
+      // Reset form
       setSelectedTask(null);
-      setSubmissionText('');
+      setSubmissionText("");
       setSubmissionFile(null);
-      alert('Task submitted successfully!');
+
+      alert("Task submitted successfully!");
     } catch (error) {
-      setError('Failed to submit task');
-      console.error('Task submission error:', error);
+      setError("Failed to submit task: " + error.message);
+      console.error("Task submission error:", error);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Download certificate
+  // Download certificate with enhanced error handling
   const downloadCertificate = async () => {
     try {
       const token = getToken();
-      const response = await fetch(`${API_BASE_URL}/certificate/download`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const configs = getApiConfig();
+      
+      for (const config of configs) {
+        try {
+          const response = await fetch(`${config.baseUrl}/certificate/download`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-      if (!response.ok) {
-        throw new Error('Certificate not available');
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new Error("Certificate not yet available");
+            }
+            throw new Error("Failed to download certificate");
+          }
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${internData?.name || "intern"}_certificate.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          return;
+        } catch (error) {
+          if (config === configs[configs.length - 1]) {
+            throw error;
+          }
+        }
       }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'certificate.pdf';
-      a.click();
-      window.URL.revokeObjectURL(url);
     } catch (error) {
-      alert('Certificate not available for download yet');
+      alert(error.message || "Certificate not available for download yet");
     }
   };
 
   // Logout
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/intern/login';
+    localStorage.removeItem("token");
+    if (process.env.NODE_ENV !== 'development') {
+      window.location.href = "/intern/login";
+    } else {
+      alert("Logout clicked (redirect disabled in development)");
+    }
+  };
+
+  // Retry all data fetching
+  const retryFetchAll = async () => {
+    setError(null);
+    setLoading(true);
+    
+    try {
+      await testConnection();
+      await Promise.all([
+        fetchDashboardData(),
+        fetchTasks(),
+        fetchAnnouncements(),
+        fetchTimeline()
+      ]);
+    } catch (error) {
+      console.error('Retry failed:', error);
+    }
   };
 
   // Load data on component mount
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      window.location.href = '/intern/login';
-      return;
+    console.log('🚀 InternDashboard mounting...');
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('API Configs:', getApiConfig());
+    
+    if (!validateAuth()) {
+      console.warn('⚠️ Authentication validation failed');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔧 Continuing in development mode...');
+      } else {
+        return;
+      }
     }
 
-    fetchDashboardData();
-    fetchTasks();
-    fetchAnnouncements();
-    fetchTimeline();
+    // Initialize data fetching
+    const initializeData = async () => {
+      await testConnection();
+      await Promise.all([
+        fetchDashboardData(),
+        fetchTasks(),
+        fetchAnnouncements(),
+        fetchTimeline()
+      ]);
+    };
+
+    initializeData();
   }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'In Progress': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Completed': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Submitted': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'Approved': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "In Progress":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "Completed":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "Submitted":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      case "Approved":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const navItems = [
-    { id: 'dashboard', icon: Home, label: 'Dashboard' },
-    { id: 'profile', icon: User, label: 'My Profile' },
-    { id: 'tasks', icon: FileText, label: 'My Tasks' },
-    { id: 'certificates', icon: Trophy, label: 'Certificates' },
-    { id: 'announcements', icon: Bell, label: 'Announcements' },
-    { id: 'help', icon: HelpCircle, label: 'Help & Support' },
-    { id: 'logout', icon: LogOut, label: 'Logout' }
+    { id: "dashboard", icon: Home, label: "Dashboard" },
+    { id: "profile", icon: User, label: "My Profile" },
+    { id: "tasks", icon: FileText, label: "My Tasks" },
+    { id: "certificates", icon: Trophy, label: "Certificates" },
+    { id: "announcements", icon: Bell, label: "Announcements" },
+    { id: "help", icon: HelpCircle, label: "Help & Support" },
+    { id: "logout", icon: LogOut, label: "Logout" },
   ];
+
+  // Connection status indicator
+  const ConnectionStatus = () => {
+    const getStatusInfo = () => {
+      switch (connectionStatus) {
+        case 'connected':
+          return { icon: Wifi, color: 'text-green-500', text: 'Connected' };
+        case 'disconnected':
+          return { icon: WifiOff, color: 'text-red-500', text: 'Disconnected' };
+        case 'checking':
+          return { icon: Loader, color: 'text-yellow-500', text: 'Connecting...', animate: true };
+        default:
+          return { icon: AlertCircle, color: 'text-gray-500', text: 'Unknown' };
+      }
+    };
+
+    const { icon: Icon, color, text, animate } = getStatusInfo();
+
+    return (
+      <div className={`flex items-center space-x-2 text-sm ${color}`}>
+        <Icon size={16} className={animate ? 'animate-spin' : ''} />
+        <span>{text}</span>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex items-center space-x-2">
-          <Loader className="animate-spin" size={24} />
-          <span>Loading dashboard...</span>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <Loader className="animate-spin mx-auto mb-4 text-blue-500" size={48} />
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Loading Dashboard...</h2>
+          <p className="text-gray-600 mb-4">Connecting to server and fetching your data</p>
+          <ConnectionStatus />
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && !internData) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center max-w-md">
           <AlertCircle className="mx-auto text-red-500 mb-4" size={48} />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Dashboard</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Connection Error
+          </h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Retry
-          </button>
+          <ConnectionStatus />
+          <div className="mt-6 space-y-3">
+            <button
+              onClick={retryFetchAll}
+              className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center justify-center space-x-2"
+            >
+              <RefreshCw size={16} />
+              <span>Retry Connection</span>
+            </button>
+            {process.env.NODE_ENV === 'development' && (
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+              >
+                Reload Page
+              </button>
+            )}
+          </div>
+          
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-left">
+              <h3 className="font-medium text-yellow-800 mb-2">🔧 Development Debug Info:</h3>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>• Check if your backend server is running</li>
+                <li>• Verify proxy configuration in vite.config.js or package.json</li>
+                <li>• Check backend CORS settings</li>
+                <li>• Ensure backend is accessible at: https://hrms-backend-5wau.onrender.com</li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -257,16 +633,21 @@ const InternDashboard = () => {
       <div className="w-64 bg-white shadow-lg flex flex-col">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-800">Intern Portal</h2>
+          <div className="mt-2">
+            <ConnectionStatus />
+          </div>
         </div>
         <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => item.id === 'logout' ? handleLogout() : setActiveNav(item.id)}
+              onClick={() =>
+                item.id === "logout" ? handleLogout() : setActiveNav(item.id)
+              }
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                activeNav === item.id 
-                  ? 'bg-blue-100 text-blue-700 font-medium' 
-                  : 'text-gray-600 hover:bg-gray-100'
+                activeNav === item.id
+                  ? "bg-blue-100 text-blue-700 font-medium"
+                  : "text-gray-600 hover:bg-gray-100"
               }`}
             >
               <item.icon size={20} />
@@ -280,16 +661,55 @@ const InternDashboard = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-lg font-bold">
-              {internData?.name?.split(' ').map(n => n[0]).join('') || 'IN'}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-lg font-bold">
+                {internData?.name
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("") || "IN"}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">
+                  Welcome, {internData?.name || "Intern"}!
+                </h1>
+                <p className="text-blue-100">
+                  Your training ends on:{" "}
+                  {internData?.trainingEndDate || "Not set"}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold">Welcome, {internData?.name || 'Intern'}!</h1>
-              <p className="text-blue-100">Your training ends on: {internData?.trainingEndDate || 'Not set'}</p>
-            </div>
+            
+            {error && (
+              <button
+                onClick={retryFetchAll}
+                className="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center space-x-2 text-sm"
+                title="Retry failed requests"
+              >
+                <RefreshCw size={16} />
+                <span>Retry</span>
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Error Banner */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4">
+            <div className="flex items-center">
+              <AlertCircle className="text-red-500 mr-3" size={20} />
+              <div className="flex-1">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="text-red-500 hover:text-red-700"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-6">
@@ -298,9 +718,12 @@ const InternDashboard = () => {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-600">Tasks Completed</h3>
+                  <h3 className="text-sm font-medium text-gray-600">
+                    Tasks Completed
+                  </h3>
                   <p className="text-2xl font-bold text-gray-900">
-                    {internData?.tasksCompleted || 0} of {internData?.totalTasks || 0}
+                    {internData?.tasksCompleted || 0} of{" "}
+                    {internData?.totalTasks || 0}
                   </p>
                 </div>
                 <CheckCircle className="text-green-500" size={24} />
@@ -310,8 +733,12 @@ const InternDashboard = () => {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-600">Days Remaining</h3>
-                  <p className="text-2xl font-bold text-gray-900">{internData?.daysRemaining || 0} Days</p>
+                  <h3 className="text-sm font-medium text-gray-600">
+                    Days Remaining
+                  </h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {internData?.daysRemaining || 0} Days
+                  </p>
                 </div>
                 <Calendar className="text-blue-500" size={24} />
               </div>
@@ -320,9 +747,11 @@ const InternDashboard = () => {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-600">Upcoming Deadline</h3>
+                  <h3 className="text-sm font-medium text-gray-600">
+                    Upcoming Deadline
+                  </h3>
                   <p className="text-sm font-medium text-gray-900">
-                    {internData?.upcomingDeadline || 'No upcoming deadlines'}
+                    {internData?.upcomingDeadline || "No upcoming deadlines"}
                   </p>
                 </div>
                 <Clock className="text-orange-500" size={24} />
@@ -332,8 +761,12 @@ const InternDashboard = () => {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-600">Certificate Progress</h3>
-                  <p className="text-2xl font-bold text-gray-900">{internData?.certificateProgress || 0}%</p>
+                  <h3 className="text-sm font-medium text-gray-600">
+                    Certificate Progress
+                  </h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {internData?.certificateProgress || 0}%
+                  </p>
                 </div>
                 <Award className="text-purple-500" size={24} />
               </div>
@@ -345,52 +778,90 @@ const InternDashboard = () => {
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-800">Task Status</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    Task Status
+                  </h2>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Task Title</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Task Title
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Assigned Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Due Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {tasks.map((task) => (
-                        <tr key={task.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm text-gray-900">{task.title}</td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{task.assignedDate}</td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{task.dueDate}</td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(task.status)}`}>
-                              {task.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex space-x-2">
-                              <button 
-                                onClick={() => setSelectedTask(task)}
-                                className="text-blue-600 hover:text-blue-800"
-                                title="View Details"
+                      {tasks.length > 0 ? (
+                        tasks.map((task) => (
+                          <tr key={task.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 text-sm text-gray-900">
+                              {task.title}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              {task.dueDate}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(
+                                  task.status
+                                )}`}
                               >
-                                <Eye size={16} />
-                              </button>
-                              {task.status === 'Pending' && (
-                                <button 
+                                {task.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex space-x-2">
+                                <button
                                   onClick={() => setSelectedTask(task)}
-                                  className="text-green-600 hover:text-green-800"
-                                  title="Submit Task"
+                                  className="text-blue-600 hover:text-blue-800"
+                                  title="View Details"
                                 >
-                                  <Upload size={16} />
+                                  <Eye size={16} />
+                                </button>
+                                {task.status === "Pending" && (
+                                  <button
+                                    onClick={() => setSelectedTask(task)}
+                                    className="text-green-600 hover:text-green-800"
+                                    title="Submit Task"
+                                  >
+                                    <Upload size={16} />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                            <div className="flex flex-col items-center space-y-2">
+                              <FileText className="text-gray-300" size={48} />
+                              <p>No tasks available</p>
+                              {connectionStatus === 'disconnected' && (
+                                <button
+                                  onClick={retryFetchAll}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  Retry loading tasks
                                 </button>
                               )}
                             </div>
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -402,21 +873,35 @@ const InternDashboard = () => {
               {/* Announcements */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-800">📢 Announcements</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    📢 Announcements
+                  </h2>
                 </div>
                 <div className="p-6 space-y-4">
-                  {announcements.map((announcement, index) => (
-                    <div key={index} className="text-sm text-gray-600 p-3 bg-blue-50 rounded-lg">
-                      {announcement}
+                  {announcements.length > 0 ? (
+                    announcements.map((announcement, index) => (
+                      <div
+                        key={index}
+                        className="text-sm text-gray-600 p-3 bg-blue-50 rounded-lg"
+                      >
+                        {announcement}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-gray-500 py-4">
+                      <Bell className="text-gray-300 mx-auto mb-2" size={32} />
+                      <p className="text-sm">No announcements yet</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 
               {/* Certificate Section */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-800">🎓 Certificate</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    🎓 Certificate
+                  </h2>
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-4">
@@ -426,18 +911,20 @@ const InternDashboard = () => {
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                    <div 
+                    <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${internData?.certificateProgress || 0}%` }}
+                      style={{
+                        width: `${internData?.certificateProgress || 0}%`,
+                      }}
                     ></div>
                   </div>
-                  <button 
+                  <button
                     onClick={downloadCertificate}
                     disabled={internData?.certificateProgress !== 100}
                     className={`w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                      internData?.certificateProgress === 100 
-                        ? 'bg-green-600 text-white hover:bg-green-700' 
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      internData?.certificateProgress === 100
+                        ? "bg-green-600 text-white hover:bg-green-700"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     <Download size={16} />
@@ -452,11 +939,13 @@ const InternDashboard = () => {
               {/* Help & Support */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-800">💬 Help & Support</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    💬 Help & Support
+                  </h2>
                 </div>
                 <div className="p-6">
-                  <a 
-                    href="mailto:info@thevsoft.com" 
+                  <a
+                    href="mailto:info@thevsoft.com"
                     className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 mb-4"
                   >
                     <span>📧</span>
@@ -466,6 +955,44 @@ const InternDashboard = () => {
                     <MessageCircle size={16} />
                     <span>Live Chat</span>
                   </button>
+                  
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <h4 className="text-sm font-medium text-yellow-800 mb-1">🔧 Debug Actions</h4>
+                      <div className="space-y-2">
+                        <button
+                          onClick={testConnection}
+                          className="w-full text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded"
+                        >
+                          Test Connection
+                        </button>
+                        <button
+                          onClick={() => {
+                            console.log('Current State:', {
+                              internData,
+                              tasks,
+                              announcements,
+                              timelineSteps,
+                              connectionStatus,
+                              error
+                            });
+                          }}
+                          className="w-full text-xs bg-green-100 text-green-700 px-2 py-1 rounded"
+                        >
+                          Log State
+                        </button>
+                        <button
+                          onClick={() => {
+                            localStorage.clear();
+                            window.location.reload();
+                          }}
+                          className="w-full text-xs bg-red-100 text-red-700 px-2 py-1 rounded"
+                        >
+                          Clear Storage & Reload
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -475,31 +1002,47 @@ const InternDashboard = () => {
           <div className="mt-8">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-800">🛣️ Training Progress Timeline</h2>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  🛣️ Training Progress Timeline
+                </h2>
               </div>
               <div className="p-6">
-                <div className="flex flex-wrap justify-between items-center space-y-4 md:space-y-0">
-                  {timelineSteps.map((step, index) => (
-                    <div key={index} className="flex flex-col items-center space-y-2 relative">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                        step.status === 'completed' 
-                          ? 'bg-green-500 text-white' 
-                          : step.status === 'current' 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-gray-200 text-gray-500'
-                      }`}>
-                        {index + 1}
+                {timelineSteps.length > 0 ? (
+                  <div className="flex flex-wrap justify-between items-center space-y-4 md:space-y-0">
+                    {timelineSteps.map((step, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col items-center space-y-2 relative"
+                      >
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                            step.status === "completed"
+                              ? "bg-green-500 text-white"
+                              : step.status === "current"
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-200 text-gray-500"
+                          }`}
+                        >
+                          {index + 1}
+                        </div>
+                        <div className="text-center">
+                          <h3 className="text-sm font-medium text-gray-800">
+                            {step.title}
+                          </h3>
+                          <p className="text-xs text-gray-500">{step.date}</p>
+                        </div>
+                        {index < timelineSteps.length - 1 && (
+                          <div className="hidden md:block absolute top-4 left-full w-16 h-0.5 bg-gray-200 transform translate-x-4"></div>
+                        )}
                       </div>
-                      <div className="text-center">
-                        <h3 className="text-sm font-medium text-gray-800">{step.title}</h3>
-                        <p className="text-xs text-gray-500">{step.date}</p>
-                      </div>
-                      {index < timelineSteps.length - 1 && (
-                        <div className="hidden md:block absolute top-4 left-full w-16 h-0.5 bg-gray-200 transform translate-x-4"></div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-500 py-8">
+                    <Calendar className="text-gray-300 mx-auto mb-2" size={48} />
+                    <p>Timeline not available</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -511,7 +1054,9 @@ const InternDashboard = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">{selectedTask.title}</h2>
+              <h2 className="text-xl font-semibold text-gray-800">
+                {selectedTask.title}
+              </h2>
             </div>
             <div className="p-6">
               <div className="space-y-4">
@@ -520,22 +1065,28 @@ const InternDashboard = () => {
                     Task Description
                   </label>
                   <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                    {selectedTask.description || 'No description provided'}
+                    {selectedTask.description || "No description provided"}
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Due Date
                     </label>
-                    <p className="text-sm text-gray-600">{selectedTask.dueDate}</p>
+                    <p className="text-sm text-gray-600">
+                      {selectedTask.dueDate}
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Status
                     </label>
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(selectedTask.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(
+                        selectedTask.status
+                      )}`}
+                    >
                       {selectedTask.status}
                     </span>
                   </div>
@@ -552,9 +1103,11 @@ const InternDashboard = () => {
                   </div>
                 )}
 
-                {selectedTask.status === 'Pending' && (
+                {selectedTask.status === "Pending" && (
                   <div className="border-t pt-4">
-                    <h3 className="text-lg font-medium text-gray-800 mb-4">Submit Task</h3>
+                    <h3 className="text-lg font-medium text-gray-800 mb-4">
+                      Submit Task
+                    </h3>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -591,14 +1144,14 @@ const InternDashboard = () => {
               >
                 Close
               </button>
-              {selectedTask.status === 'Pending' && (
+              {selectedTask.status === "Pending" && (
                 <button
                   onClick={() => submitTask(selectedTask.id)}
                   disabled={submitting || !submissionText.trim()}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                 >
                   {submitting && <Loader className="animate-spin" size={16} />}
-                  <span>{submitting ? 'Submitting...' : 'Submit Task'}</span>
+                  <span>{submitting ? "Submitting..." : "Submit Task"}</span>
                 </button>
               )}
             </div>
@@ -610,3 +1163,4 @@ const InternDashboard = () => {
 };
 
 export default InternDashboard;
+                              

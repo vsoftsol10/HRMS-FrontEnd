@@ -25,33 +25,33 @@ const API_BASE_URL = process.env.NODE_ENV === 'development'
 
 // In your InternLogin.jsx
 const testCORSConnection = async () => {
+  // Only test CORS in development, and make it non-blocking
+  if (process.env.NODE_ENV !== 'development') {
+    return true; // Skip in production
+  }
+  
   try {
     console.log("🧪 Testing CORS connection...");
     
-    // Use the full URL in production
-    const url = process.env.NODE_ENV === 'development' 
-      ? '/api/cors-test' 
-      : `${API_BASE_URL}/api/cors-test`;
-    
-    const response = await fetch(url, {
+    const response = await fetch('/api/cors-test', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit', // No credentials for cross-origin in production
+      credentials: 'include',
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.warn("CORS test failed, but continuing...");
+      return false;
     }
     
     const data = await response.json();
     console.log("✅ CORS Test Success:", data);
-    return data;
+    return true;
   } catch (error) {
-    console.error("❌ CORS Test Error:", error);
-    // Don't throw error in production - just return false
-    return false;
+    console.warn("CORS test failed:", error.message);
+    return false; // Don't block the main request
   }
 };
 
@@ -217,76 +217,101 @@ const testCORSConnection = async () => {
   setErrors({});
   
   try {
-    // Test CORS first
-    const corsTest = await testCORSConnection();
-    if (!corsTest) {
-      setErrors({ submit: 'Unable to connect to server. Please try again later.' });
-      setIsLoading(false);
-      return;
+    // Define endpoint and payload based on form mode
+    const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/login';
+    const payload = isSignUp 
+      ? {
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password
+        }
+      : {
+          email: formData.email,
+          password: formData.password
+        };
+
+    // Test CORS first (optional - you can remove this if it's causing issues)
+    if (process.env.NODE_ENV === 'development') {
+      const corsTest = await testCORSConnection();
+      if (!corsTest) {
+        console.warn('CORS test failed, but continuing with request...');
+        // Don't return here, continue with the actual request
+      }
     }
 
-    // Fixed endpoints - added /api prefix
+    // Construct the URL properly
     const url = process.env.NODE_ENV === 'development' 
-  ? endpoint 
-  : `${API_BASE_URL}${endpoint}`;
+      ? endpoint  // This will use your proxy
+      : `${API_BASE_URL}${endpoint}`;
 
-console.log('API URL:', url);
-console.log('Payload:', payload);
+    console.log('API URL:', url);
+    console.log('Payload:', payload);
 
-  const response = await fetch(url, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit',
-  body: JSON.stringify(payload)
-});
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: process.env.NODE_ENV === 'development' ? 'include' : 'omit',
+      body: JSON.stringify(payload)
+    });
 
     console.log('Response status:', response.status);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
+    // Check if response is actually JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      // If we're not getting JSON, log the HTML response for debugging
+      const htmlText = await response.text();
+      console.error('Expected JSON but got:', htmlText.substring(0, 500));
+      throw new Error('Server returned HTML instead of JSON. Check if the API endpoint exists.');
+    }
+
     const data = await response.json();
     console.log('Response data:', data);
-if (response.ok) {
-  // Success
-  console.log('✅ Login/Signup successful!');
-  
-  if (isSignUp) {
-    console.log('📝 Sign up success');
-    setSuccessMessage(data.message || 'Account created successfully! Please check your email for verification.');
-    
-    // Clear form
-    setFormData({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      fullName: '',
-    });
-  } else {
-    // Login success
-    console.log('🔐 Login success');
-    console.log('📊 Response data:', data);
-    
-    setSuccessMessage(data.message || 'Login successful!');
-    
-    // Store token if needed
-    if (data.token) {
-      console.log("💾 Storing token...");
-      localStorage.setItem('token', data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      console.log("✅ Token stored");
-    }
-    
-    // Add a small delay to ensure state updates
-    setTimeout(() => {
-      console.log('🚀 Navigating to /intern/dashboard...');
-      navigate('/intern/dashboard');
-      console.log('✅ Navigation called');
-    }, 100);
-  }
-} else {
-  console.log('❌ Response not ok:', response.status, response.statusText);
-  console.log('📊 Error data:', data);
+
+    if (response.ok) {
+      // Success
+      console.log('✅ Login/Signup successful!');
+      
+      if (isSignUp) {
+        console.log('📝 Sign up success');
+        setSuccessMessage(data.message || 'Account created successfully! Please check your email for verification.');
+        
+        // Clear form
+        setFormData({
+          email: '',
+          password: '',
+          confirmPassword: '',
+          fullName: '',
+        });
+      } else {
+        // Login success
+        console.log('🔐 Login success');
+        console.log('📊 Response data:', data);
+        
+        setSuccessMessage(data.message || 'Login successful!');
+        
+        // Store token if needed
+        if (data.token) {
+          console.log("💾 Storing token...");
+          localStorage.setItem('token', data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          console.log("✅ Token stored");
+        }
+        
+        // Add a small delay to ensure state updates
+        setTimeout(() => {
+          console.log('🚀 Navigating to /intern/dashboard...');
+          navigate('/intern/dashboard');
+          console.log('✅ Navigation called');
+        }, 100);
+      }
+    } else {
+      console.log('❌ Response not ok:', response.status, response.statusText);
+      console.log('📊 Error data:', data);
+      
       // Handle different types of errors
       if (data.details && Array.isArray(data.details)) {
         // Validation errors from express-validator
@@ -318,6 +343,8 @@ if (response.ok) {
     // More specific error handling
     if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
       setErrors({ submit: 'Network error: Unable to connect to server. Please check your internet connection and try again.' });
+    } else if (error.message.includes('HTML instead of JSON')) {
+      setErrors({ submit: 'Server configuration error. Please contact support.' });
     } else {
       setErrors({ submit: 'Network error. Please check your connection and try again.' });
     }

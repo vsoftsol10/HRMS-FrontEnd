@@ -108,7 +108,7 @@ const InternDashboard = () => {
         
         const token = getToken();
         const url = `${config.baseUrl}${endpoint}`;
-        
+        console.log("current Token: ",getToken())
         const response = await fetch(url, {
           ...options,
           headers: {

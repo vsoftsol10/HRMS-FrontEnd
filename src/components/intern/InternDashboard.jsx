@@ -37,27 +37,26 @@ const InternDashboard = () => {
   const [submitting, setSubmitting] = useState(false);
 
   // Enhanced API configuration with multiple fallback options
-  const getApiConfig = () => {
-    const isDevelopment = process.env.NODE_ENV === "development";
-    
-    const configs = [
-      // Primary: Proxy in development, direct production URL in production
-      {
-        name: 'Primary',
-        baseUrl: isDevelopment ? '/api' : 'https://hrms-backend-5wau.onrender.com/api',
-        description: isDevelopment ? 'Development proxy' : 'Production server'
-      },
-      // Fallback 1: Always try direct production URL
-      {
-        name: 'Direct Production',
-        baseUrl: 'https://hrms-backend-5wau.onrender.com/api',
-        description: 'Direct production server connection'
-      },
- 
-    ];
+const getApiConfig = () => {
+  const isDevelopment = process.env.NODE_ENV === "development";
+  
+  const configs = [
+    // Primary: Development proxy configuration
+    {
+      name: 'Development Proxy',
+      baseUrl: isDevelopment ? '' : 'https://hrms-backend-5wau.onrender.com', // Remove /api from baseUrl
+      description: isDevelopment ? 'Development proxy via Vite' : 'Production server'
+    },
+    // Fallback: Direct production URL
+    {
+      name: 'Direct Production',
+      baseUrl: 'https://hrms-backend-5wau.onrender.com',
+      description: 'Direct production server connection'
+    }
+  ];
 
-    return configs;
-  };
+  return configs;
+};
 
   // Get token from localStorage
   const getToken = () => {
@@ -94,137 +93,151 @@ const InternDashboard = () => {
   };
 
   // Enhanced API call with multiple fallback attempts
-  const apiCall = async (endpoint, options = {}) => {
-    const configs = getApiConfig();
-    let lastError = null;
+const apiCall = async (endpoint, options = {}) => {
+  const configs = getApiConfig();
+  let lastError = null;
+  
+  console.log(`🔄 Attempting API call to ${endpoint}`);
+  
+  for (let i = 0; i < configs.length; i++) {
+    const config = configs[i];
     
-    console.log(`🔄 Attempting API call to ${endpoint}`);
-    
-    for (let i = 0; i < configs.length; i++) {
-      const config = configs[i];
-      
-      try {
-        console.log(`📡 Trying ${config.name}: ${config.baseUrl}${endpoint}`);
-        
-        const token = getToken();
-        const url = `${config.baseUrl}${endpoint}`;
-        console.log("current Token: ",getToken())
-        const response = await fetch(url, {
-          ...options,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` }),
-            // Add CORS headers for direct requests
-            'Accept': 'application/json',
-            ...options.headers,
-          },
-          // Add timeout
-          signal: AbortSignal.timeout(10000), // 10 second timeout
-        });
-
-        console.log(`📊 Response from ${config.name}:`, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries())
-        });
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            console.warn('Authentication failed');
-            localStorage.removeItem('token');
-            if (process.env.NODE_ENV !== 'development') {
-              window.location.href = '/intern/login';
-            }
-            throw new Error('Authentication failed');
-          }
-          
-          // Try to get error message from response
-          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-          try {
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-              const errorData = await response.json();
-              errorMessage = errorData.message || errorMessage;
-            } else {
-              // If we get HTML, it might be an error page
-              const text = await response.text();
-              if (text.includes('<html>')) {
-                errorMessage = `Server returned HTML instead of JSON (${response.status}). Backend might be down.`;
-              }
-            }
-          } catch (parseError) {
-            console.warn('Could not parse error response:', parseError);
-          }
-          
-          throw new Error(errorMessage);
-        }
-
-        // Validate JSON response
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error(`Expected JSON but received: ${contentType || 'unknown'}`);
-        }
-
-        const data = await response.json();
-        console.log(`✅ Success with ${config.name}:`, data);
-        
-        // Update connection status on successful call
-        setConnectionStatus('connected');
-        
-        return data;
-
-      } catch (error) {
-        console.error(`❌ Failed with ${config.name}:`, error);
-        lastError = error;
-        
-        // Don't try other configs for auth errors
-        if (error.message.includes('Authentication failed')) {
-          break;
-        }
-        
-        // Continue to next config
-        continue;
-      }
-    }
-    
-    // All configs failed
-    setConnectionStatus('disconnected');
-    
-    // Provide helpful error message based on the last error
-    if (lastError.name === 'TypeError' && lastError.message.includes('fetch')) {
-      throw new Error('🔌 Cannot connect to server. Please check your internet connection and try again.');
-    }
-    
-    if (lastError.name === 'AbortError') {
-      throw new Error('⏱️ Request timed out. The server might be slow or down.');
-    }
-    
-    if (lastError.message.includes('CORS')) {
-      throw new Error('🚫 CORS error. Backend server configuration issue.');
-    }
-    
-    throw new Error(`🚨 All connection attempts failed. Last error: ${lastError.message}`);
-  };
-
-  // Test API connectivity
-  const testConnection = async () => {
     try {
-      setConnectionStatus('checking');
-      console.log('🔍 Testing API connectivity...');
+      // Ensure endpoint starts with /api if not already present
+      const cleanEndpoint = endpoint.startsWith('/api') ? endpoint : `/api${endpoint}`;
+      const url = `${config.baseUrl}${cleanEndpoint}`;
       
-      // Try a simple health check or the dashboard endpoint
-      await apiCall('/dashboard');
+      console.log(`📡 Trying ${config.name}: ${url}`);
+      
+      const token = getToken();
+      
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+          'Accept': 'application/json',
+          ...options.headers,
+        },
+        signal: AbortSignal.timeout(15000), // Increased timeout
+      });
+
+      console.log(`📊 Response from ${config.name}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        headers: {
+          'content-type': response.headers.get('content-type'),
+          'content-length': response.headers.get('content-length')
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.warn('Authentication failed - token might be expired');
+          localStorage.removeItem('token');
+          if (process.env.NODE_ENV !== 'development') {
+            window.location.href = '/intern/login';
+          }
+          throw new Error('Authentication failed');
+        }
+        
+        // Log the actual response for debugging
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        let responseText = '';
+        
+        try {
+          responseText = await response.text();
+          console.log('Error response body:', responseText);
+          
+          // Try to parse as JSON first
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            const errorData = JSON.parse(responseText);
+            errorMessage = errorData.message || errorMessage;
+          } else {
+            // If HTML response, it's likely a 404 or server error page
+            if (responseText.includes('<html>') || responseText.includes('<!DOCTYPE')) {
+              errorMessage = `Server returned HTML page (${response.status}). Endpoint might not exist.`;
+            }
+          }
+        } catch (parseError) {
+          console.warn('Could not parse error response:', parseError);
+          errorMessage += ` (Could not parse response body)`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Validate JSON response
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Non-JSON response:', responseText);
+        throw new Error(`Expected JSON but received: ${contentType || 'unknown'}. Response: ${responseText.substring(0, 200)}...`);
+      }
+
+      const data = await response.json();
+      console.log(`✅ Success with ${config.name}:`, data);
       
       setConnectionStatus('connected');
-      console.log('✅ API connection successful');
-      return true;
-    } catch (error) {
-      console.error('❌ API connection failed:', error);
-      setConnectionStatus('disconnected');
-      return false;
-    }
-  };
+      return data;
 
+    } catch (error) {
+      console.error(`❌ Failed with ${config.name}:`, error);
+      lastError = error;
+      
+      // Don't try other configs for auth errors
+      if (error.message.includes('Authentication failed')) {
+        break;
+      }
+      
+      continue;
+    }
+  }
+  
+  // All configs failed
+  setConnectionStatus('disconnected');
+  
+  // Provide helpful error message
+  if (lastError.name === 'TypeError' && lastError.message.includes('fetch')) {
+    throw new Error('🔌 Network error: Cannot connect to server. Check your internet connection.');
+  }
+  
+  if (lastError.name === 'AbortError') {
+    throw new Error('⏱️ Request timeout: Server is taking too long to respond.');
+  }
+  
+  if (lastError.message.includes('HTML page')) {
+    throw new Error('🚫 API endpoint not found: The backend endpoint does not exist or is incorrectly configured.');
+  }
+  
+  throw new Error(`🚨 Connection failed: ${lastError.message}`);
+};
+
+
+  // Test API connectivity
+const testConnection = async () => {
+  try {
+    setConnectionStatus('checking');
+    console.log('🔍 Testing API connectivity...');
+    
+    // Try a health check endpoint first, fallback to dashboard
+    try {
+      await apiCall('/health');
+    } catch (healthError) {
+      console.log('Health endpoint not available, trying dashboard...');
+      await apiCall('/dashboard');
+    }
+    
+    setConnectionStatus('connected');
+    console.log('✅ API connection successful');
+    return true;
+  } catch (error) {
+    console.error('❌ API connection failed:', error);
+    setConnectionStatus('disconnected');
+    return false;
+  }
+};
   // Enhanced data fetching with better error handling
 const fetchDashboardData = async () => {
   try {
@@ -232,10 +245,25 @@ const fetchDashboardData = async () => {
     setError(null);
     
     console.log('📊 Fetching dashboard data...');
-    const data = await apiCall("/dashboard");
+    
+    // Try different possible endpoints
+    let data = null;
+    const possibleEndpoints = ['/dashboard', '/intern/dashboard', '/api/intern/dashboard'];
+    
+    for (const endpoint of possibleEndpoints) {
+      try {
+        console.log(`Trying endpoint: ${endpoint}`);
+        data = await apiCall(endpoint);
+        break; // Success, exit loop
+      } catch (endpointError) {
+        console.log(`Endpoint ${endpoint} failed:`, endpointError.message);
+        if (endpoint === possibleEndpoints[possibleEndpoints.length - 1]) {
+          throw endpointError; // Last endpoint failed, throw error
+        }
+      }
+    }
     
     if (data) {
-      // The backend now returns the data directly, not nested in internData
       setInternData(data);
       console.log('✅ Dashboard data loaded:', data);
     }
@@ -262,11 +290,28 @@ const fetchDashboardData = async () => {
   }
 };
 
+
   // Also fix the tasks fetch to handle the date field correctly
 const fetchTasks = async () => {
   try {
     console.log('📋 Fetching tasks...');
-    const data = await apiCall("/tasks");
+    
+    // Try different possible endpoints
+    let data = null;
+    const possibleEndpoints = ['/tasks', '/intern/tasks', '/api/intern/tasks'];
+    
+    for (const endpoint of possibleEndpoints) {
+      try {
+        console.log(`Trying tasks endpoint: ${endpoint}`);
+        data = await apiCall(endpoint);
+        break;
+      } catch (endpointError) {
+        console.log(`Tasks endpoint ${endpoint} failed:`, endpointError.message);
+        if (endpoint === possibleEndpoints[possibleEndpoints.length - 1]) {
+          throw endpointError;
+        }
+      }
+    }
     
     if (data) {
       setTasks(Array.isArray(data) ? data : []);
@@ -302,54 +347,85 @@ const fetchTasks = async () => {
 };
 
   const fetchAnnouncements = async () => {
-    try {
-      console.log('📢 Fetching announcements...');
-      const data = await apiCall("/announcements");
-      
-      if (data) {
-        setAnnouncements(Array.isArray(data) ? data : []);
-        console.log('✅ Announcements loaded:', data);
-      }
-    } catch (error) {
-      const errorMsg = `Failed to fetch announcements: ${error.message}`;
-      console.error("Announcements fetch error:", error);
-      
-      // Set mock data in development
-      if (process.env.NODE_ENV === 'development') {
-        setAnnouncements([
-          "🎉 Welcome to the internship program!",
-          "📚 New learning resources available in the portal",
-          "⏰ Weekly standup meetings every Monday at 10 AM"
-        ]);
+  try {
+    console.log('📢 Fetching announcements...');
+    
+    let data = null;
+    const possibleEndpoints = ['/announcements', '/intern/announcements', '/api/intern/announcements'];
+    
+    for (const endpoint of possibleEndpoints) {
+      try {
+        console.log(`Trying announcements endpoint: ${endpoint}`);
+        data = await apiCall(endpoint);
+        break;
+      } catch (endpointError) {
+        console.log(`Announcements endpoint ${endpoint} failed:`, endpointError.message);
+        if (endpoint === possibleEndpoints[possibleEndpoints.length - 1]) {
+          throw endpointError;
+        }
       }
     }
-  };
+    
+    if (data) {
+      setAnnouncements(Array.isArray(data) ? data : []);
+      console.log('✅ Announcements loaded:', data);
+    }
+  } catch (error) {
+    const errorMsg = `Failed to fetch announcements: ${error.message}`;
+    console.error("Announcements fetch error:", error);
+    
+    // Set mock data in development
+    if (process.env.NODE_ENV === 'development') {
+      setAnnouncements([
+        "🎉 Welcome to the internship program!",
+        "📚 New learning resources available in the portal",
+        "⏰ Weekly standup meetings every Monday at 10 AM"
+      ]);
+    }
+  }
+};
+
 
   const fetchTimeline = async () => {
-    try {
-      console.log('📅 Fetching timeline...');
-      const data = await apiCall("/timeline");
-      
-      if (data) {
-        setTimelineSteps(Array.isArray(data) ? data : []);
-        console.log('✅ Timeline loaded:', data);
-      }
-    } catch (error) {
-      const errorMsg = `Failed to fetch timeline: ${error.message}`;
-      console.error("Timeline fetch error:", error);
-      
-      // Set mock data in development
-      if (process.env.NODE_ENV === 'development') {
-        setTimelineSteps([
-          { title: "Onboarding", date: "Week 1", status: "completed" },
-          { title: "Training Phase 1", date: "Week 2-4", status: "completed" },
-          { title: "Project Work", date: "Week 5-8", status: "current" },
-          { title: "Final Review", date: "Week 9", status: "pending" },
-          { title: "Completion", date: "Week 10", status: "pending" }
-        ]);
+  try {
+    console.log('📅 Fetching timeline...');
+    
+    let data = null;
+    const possibleEndpoints = ['/timeline', '/intern/timeline', '/api/intern/timeline'];
+    
+    for (const endpoint of possibleEndpoints) {
+      try {
+        console.log(`Trying timeline endpoint: ${endpoint}`);
+        data = await apiCall(endpoint);
+        break;
+      } catch (endpointError) {
+        console.log(`Timeline endpoint ${endpoint} failed:`, endpointError.message);
+        if (endpoint === possibleEndpoints[possibleEndpoints.length - 1]) {
+          throw endpointError;
+        }
       }
     }
-  };
+    
+    if (data) {
+      setTimelineSteps(Array.isArray(data) ? data : []);
+      console.log('✅ Timeline loaded:', data);
+    }
+  } catch (error) {
+    const errorMsg = `Failed to fetch timeline: ${error.message}`;
+    console.error("Timeline fetch error:", error);
+    
+    // Set mock data in development
+    if (process.env.NODE_ENV === 'development') {
+      setTimelineSteps([
+        { title: "Onboarding", date: "Week 1", status: "completed" },
+        { title: "Training Phase 1", date: "Week 2-4", status: "completed" },
+        { title: "Project Work", date: "Week 5-8", status: "current" },
+        { title: "Final Review", date: "Week 9", status: "pending" },
+        { title: "Completion", date: "Week 10", status: "pending" }
+      ]);
+    }
+  }
+};
 
   // File upload with enhanced error handling
   const apiCallWithFile = async (endpoint, formData) => {

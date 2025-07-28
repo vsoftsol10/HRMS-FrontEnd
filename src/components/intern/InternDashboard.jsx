@@ -226,78 +226,80 @@ const InternDashboard = () => {
   };
 
   // Enhanced data fetching with better error handling
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('📊 Fetching dashboard data...');
-      const data = await apiCall("/dashboard");
-      
-      if (data) {
-        setInternData(data.internData || data);
-        console.log('✅ Dashboard data loaded:', data);
-      }
-    } catch (error) {
-      const errorMsg = `Failed to fetch dashboard data: ${error.message}`;
-      setError(errorMsg);
-      console.error("Dashboard fetch error:", error);
-      
-      // Set mock data in development for testing UI
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔧 Setting mock data for development');
-        setInternData({
-          name: "Test Intern",
-          trainingEndDate: "2025-08-25",
-          tasksCompleted: 3,
-          totalTasks: 5,
-          daysRemaining: 45,
-          upcomingDeadline: "Project Review - Aug 1",
-          certificateProgress: 60
-        });
-      }
-    } finally {
-      setLoading(false);
+const fetchDashboardData = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    
+    console.log('📊 Fetching dashboard data...');
+    const data = await apiCall("/dashboard");
+    
+    if (data) {
+      // The backend now returns the data directly, not nested in internData
+      setInternData(data);
+      console.log('✅ Dashboard data loaded:', data);
     }
-  };
+  } catch (error) {
+    const errorMsg = `Failed to fetch dashboard data: ${error.message}`;
+    setError(errorMsg);
+    console.error("Dashboard fetch error:", error);
+    
+    // Set mock data in development for testing UI
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 Setting mock data for development');
+      setInternData({
+        name: "Test Intern",
+        trainingEndDate: "2025-08-25",
+        tasksCompleted: 3,
+        totalTasks: 5,
+        daysRemaining: 45,
+        upcomingDeadline: "Project Review - Aug 1",
+        certificateProgress: 60
+      });
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const fetchTasks = async () => {
-    try {
-      console.log('📋 Fetching tasks...');
-      const data = await apiCall("/tasks");
-      
-      if (data) {
-        setTasks(Array.isArray(data) ? data : []);
-        console.log('✅ Tasks loaded:', data);
-      }
-    } catch (error) {
-      const errorMsg = `Failed to fetch tasks: ${error.message}`;
-      setError(errorMsg);
-      console.error("Tasks fetch error:", error);
-      
-      // Set mock data in development
-      if (process.env.NODE_ENV === 'development') {
-        setTasks([
-          {
-            id: 1,
-            title: "Complete React Tutorial",
-            assignedDate: "2025-07-20",
-            dueDate: "2025-07-30",
-            status: "Pending",
-            description: "Complete the React fundamentals tutorial and submit your project."
-          },
-          {
-            id: 2,
-            title: "API Documentation Review",
-            assignedDate: "2025-07-22",
-            dueDate: "2025-08-01",
-            status: "In Progress",
-            description: "Review and provide feedback on the API documentation."
-          }
-        ]);
-      }
+  // Also fix the tasks fetch to handle the date field correctly
+const fetchTasks = async () => {
+  try {
+    console.log('📋 Fetching tasks...');
+    const data = await apiCall("/tasks");
+    
+    if (data) {
+      setTasks(Array.isArray(data) ? data : []);
+      console.log('✅ Tasks loaded:', data);
     }
-  };
+  } catch (error) {
+    const errorMsg = `Failed to fetch tasks: ${error.message}`;
+    setError(errorMsg);
+    console.error("Tasks fetch error:", error);
+    
+    // Set mock data in development
+    if (process.env.NODE_ENV === 'development') {
+      setTasks([
+        {
+          id: 1,
+          title: "Complete React Tutorial",
+          assignedDate: "2025-07-20",
+          dueDate: "2025-07-30",
+          status: "Pending",
+          description: "Complete the React fundamentals tutorial and submit your project."
+        },
+        {
+          id: 2,
+          title: "API Documentation Review",
+          assignedDate: "2025-07-22",
+          dueDate: "2025-08-01",
+          status: "In Progress",
+          description: "Review and provide feedback on the API documentation."
+        }
+      ]);
+    }
+  }
+};
 
   const fetchAnnouncements = async () => {
     try {

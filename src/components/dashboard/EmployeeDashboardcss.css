@@ -1,4 +1,4 @@
-/* Professional Employee Dashboard Styles with Unique Class Names */
+/* Professional Employee Dashboard Styles with Custom Color Palette */
 * {
   margin: 0;
   padding: 0;
@@ -29,14 +29,14 @@ body {
 
 .emp-loading-spinner {
   font-size: 18px;
-  color: #667eea;
+  color: #793a71;
   font-weight: 600;
 }
 
 /* Sidebar Styles */
 .emp-sidebar {
   width: 280px;
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  background: linear-gradient(180deg, #793a71 0%, #941484 100%);
   color: white;
   position: fixed;
   height: 100vh;
@@ -44,7 +44,7 @@ body {
   top: 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 4px 0 20px rgba(121, 58, 113, 0.2);
   z-index: 100;
 }
 
@@ -57,12 +57,12 @@ body {
 .emp-sidebar-header h2 {
   font-size: 24px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: white;
   margin-bottom: 8px;
 }
 
 .emp-employee-badge {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #941484 0%, #793a71 100%);
   color: white;
   padding: 6px 12px;
   border-radius: 20px;
@@ -102,8 +102,9 @@ body {
 }
 
 .emp-nav-item.emp-active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #d8c8d8 0%, white 100%);
+  color: #793a71;
+  box-shadow: 0 4px 12px rgba(216, 200, 216, 0.3);
 }
 
 .emp-nav-icon {
@@ -134,16 +135,16 @@ body {
 .emp-employee-avatar {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #d8c8d8 0%, white 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
   font-weight: 700;
-  color: white;
+  color: #793a71;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(216, 200, 216, 0.3);
 }
 
 .emp-employee-details {
@@ -157,7 +158,7 @@ body {
 .emp-employee-name {
   font-size: 14px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: white;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -165,7 +166,7 @@ body {
 
 .emp-employee-id {
   font-size: 12px;
-  color: #94a3b8;
+  color: #d8c8d8;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -200,7 +201,7 @@ body {
   margin-left: 280px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #d8c8d8 100%);
   min-height: 100vh;
 }
 
@@ -209,10 +210,10 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple gradient like in photo */
+  background: linear-gradient(135deg, #793a71 0%, #941484 100%);
   padding: 24px 32px;
   border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(121, 58, 113, 0.2);
 }
 
 .emp-header-content {
@@ -222,12 +223,12 @@ body {
 .emp-header-content h1 {
   font-size: 32px;
   font-weight: 700;
-  color: white; /* Changed to white for the purple gradient background */
+  color: white;
   margin-top: 5%;
 }
 
 .emp-header-content p {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
   margin-bottom: 12px;
 }
@@ -241,7 +242,7 @@ body {
 }
 
 .emp-employee-position {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(216, 200, 216, 0.3);
   color: white;
   padding: 6px 12px;
   border-radius: 20px;
@@ -249,10 +250,11 @@ body {
   font-weight: 600;
   white-space: nowrap;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .emp-employee-department {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   color: white;
   padding: 6px 12px;
   border-radius: 20px;
@@ -260,6 +262,7 @@ body {
   font-weight: 500;
   white-space: nowrap;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .emp-header-actions {
@@ -275,13 +278,14 @@ body {
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: white; /* Changed to white for visibility on gradient */
+  color: white;
   white-space: nowrap;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .emp-clock-in-btn {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #941484 0%, #793a71 100%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -290,11 +294,12 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(148, 20, 132, 0.3);
 }
 
 .emp-clock-in-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 8px 20px rgba(148, 20, 132, 0.4);
 }
 
 /* Dashboard Cards */
@@ -309,13 +314,14 @@ body {
   background: white;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(121, 58, 113, 0.1);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 16px;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(216, 200, 216, 0.2);
 }
 
 .emp-dashboard-card::before {
@@ -325,28 +331,29 @@ body {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #793a71 0%, #941484 100%);
 }
 
 .emp-dashboard-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(121, 58, 113, 0.2);
+  border-color: rgba(148, 20, 132, 0.3);
 }
 
 .emp-dashboard-card.emp-present-days::before {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #941484 0%, #793a71 100%);
 }
 
 .emp-dashboard-card.emp-leaves-taken::before {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #d8c8d8 0%, #793a71 100%);
 }
 
 .emp-dashboard-card.emp-upcoming-holidays::before {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #793a71 0%, #941484 100%);
 }
 
 .emp-dashboard-card.emp-last-payslip::before {
-  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  background: linear-gradient(135deg, #941484 0%, #d8c8d8 100%);
 }
 
 .emp-card-icon {
@@ -356,7 +363,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
+  background: linear-gradient(135deg, #d8c8d8 0%, rgba(216, 200, 216, 0.3) 100%);
+  color: #793a71;
   border-radius: 12px;
   flex-shrink: 0;
 }
@@ -367,7 +375,7 @@ body {
 
 .emp-card-content h3 {
   font-size: 16px;
-  color: #64748b;
+  color: #793a71;
   margin-bottom: 4px;
   font-weight: 500;
 }
@@ -375,14 +383,15 @@ body {
 .emp-card-content p {
   font-size: 28px;
   font-weight: 700;
-  color: #1e293b;
+  color: #941484;
   margin-bottom: 2px;
 }
 
 .emp-card-subtitle {
   font-size: 12px;
-  color: #94a3b8;
+  color: #793a71;
   font-weight: 500;
+  opacity: 0.7;
 }
 
 /* Dashboard Content Layout */
@@ -397,7 +406,8 @@ body {
   background: white;
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(121, 58, 113, 0.1);
+  border: 1px solid rgba(216, 200, 216, 0.2);
 }
 
 .emp-section-header {
@@ -410,13 +420,13 @@ body {
 .emp-section-header h2 {
   font-size: 20px;
   font-weight: 700;
-  color: #1e293b;
+  color: #793a71;
 }
 
 .emp-view-all-btn {
   background: none;
   border: none;
-  color: #667eea;
+  color: #941484;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -424,7 +434,7 @@ body {
 }
 
 .emp-view-all-btn:hover {
-  color: #5a67d8;
+  color: #793a71;
 }
 
 .emp-activity-list {
@@ -439,13 +449,15 @@ body {
   gap: 16px;
   padding: 16px;
   border-radius: 12px;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, rgba(216, 200, 216, 0.1) 100%);
   transition: all 0.2s ease;
+  border: 1px solid rgba(216, 200, 216, 0.2);
 }
 
 .emp-activity-item:hover {
-  background: #f1f5f9;
+  background: linear-gradient(135deg, rgba(216, 200, 216, 0.2) 0%, rgba(216, 200, 216, 0.1) 100%);
   transform: translateX(4px);
+  border-color: rgba(148, 20, 132, 0.3);
 }
 
 .emp-activity-icon {
@@ -460,23 +472,23 @@ body {
 }
 
 .emp-activity-icon.emp-success {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
+  background: rgba(148, 20, 132, 0.1);
+  color: #941484;
 }
 
 .emp-activity-icon.emp-approved {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
+  background: rgba(121, 58, 113, 0.1);
+  color: #793a71;
 }
 
 .emp-activity-icon.emp-info {
-  background: rgba(59, 130, 246, 0.1);
-  color: #2563eb;
+  background: rgba(216, 200, 216, 0.3);
+  color: #793a71;
 }
 
 .emp-activity-icon.emp-holiday {
-  background: rgba(139, 92, 246, 0.1);
-  color: #7c3aed;
+  background: rgba(148, 20, 132, 0.1);
+  color: #941484;
 }
 
 .emp-activity-content {
@@ -486,20 +498,22 @@ body {
 .emp-activity-content h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1e293b;
+  color: #793a71;
   margin-bottom: 4px;
 }
 
 .emp-activity-content p {
   font-size: 14px;
-  color: #64748b;
+  color: #941484;
   margin-bottom: 6px;
+  opacity: 0.8;
 }
 
 .emp-activity-time {
   font-size: 12px;
-  color: #94a3b8;
+  color: #793a71;
   font-weight: 500;
+  opacity: 0.6;
 }
 
 /* Quick Actions Section */
@@ -507,8 +521,9 @@ body {
   background: white;
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(121, 58, 113, 0.1);
   height: fit-content;
+  border: 1px solid rgba(216, 200, 216, 0.2);
 }
 
 .emp-actions-grid {
@@ -518,8 +533,8 @@ body {
 }
 
 .emp-action-btn {
-  background: #f8fafc;
-  border: 2px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc 0%, rgba(216, 200, 216, 0.1) 100%);
+  border: 2px solid rgba(216, 200, 216, 0.3);
   border-radius: 12px;
   padding: 20px 16px;
   cursor: pointer;
@@ -532,21 +547,22 @@ body {
 }
 
 .emp-action-btn:hover {
-  background: white;
-  border-color: #667eea;
+  background: linear-gradient(135deg, white 0%, rgba(216, 200, 216, 0.2) 100%);
+  border-color: #941484;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 8px 20px rgba(148, 20, 132, 0.15);
 }
 
 .emp-action-icon {
   font-size: 24px;
   margin-bottom: 4px;
+  color: #793a71;
 }
 
 .emp-action-btn span:last-child {
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: #793a71;
 }
 
 /* Animations */

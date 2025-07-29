@@ -21,6 +21,7 @@ import {
   Wifi,
   WifiOff
 } from 'lucide-react';
+import './InternDashboard.css';
 
 const InternDashboard = () => {
   const [activeNav, setActiveNav] = useState("dashboard");
@@ -523,17 +524,17 @@ const fetchTasks = async () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "status-pending";
       case "In Progress":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "status-in-progress";
       case "Completed":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "status-completed";
       case "Submitted":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+        return "status-submitted";
       case "Approved":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "status-approved";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "status-default";
     }
   };
 
@@ -552,20 +553,20 @@ const fetchTasks = async () => {
     const getStatusInfo = () => {
       switch (connectionStatus) {
         case 'connected':
-          return { icon: Wifi, color: 'text-green-500', text: 'Connected' };
+          return { icon: Wifi, color: 'status-connected', text: 'Connected' };
         case 'disconnected':
-          return { icon: WifiOff, color: 'text-red-500', text: 'Disconnected' };
+          return { icon: WifiOff, color: 'status-disconnected', text: 'Disconnected' };
         case 'checking':
-          return { icon: Loader, color: 'text-yellow-500', text: 'Connecting...', animate: true };
+          return { icon: Loader, color: 'status-checking', text: 'Connecting...', animate: true };
         default:
-          return { icon: AlertCircle, color: 'text-gray-500', text: 'Unknown' };
+          return { icon: AlertCircle, color: 'status-unknown', text: 'Unknown' };
       }
     };
 
     const { icon: Icon, color, text, animate } = getStatusInfo();
 
     return (
-      <div className={`flex items-center space-x-2 text-sm ${color}`}>
+      <div className={`connection-status ${color}`}>
         <Icon size={16} className={animate ? 'animate-spin' : ''} />
         <span>{text}</span>
       </div>
@@ -574,11 +575,11 @@ const fetchTasks = async () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <Loader className="animate-spin mx-auto mb-4 text-blue-500" size={48} />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Loading Dashboard...</h2>
-          <p className="text-gray-600 mb-4">Connecting to server and fetching your data</p>
+      <div className="loading-screen">
+        <div className="loading-content">
+          <Loader className="loading-spinner" size={48} />
+          <h2 className="loading-title">Loading Dashboard...</h2>
+          <p className="loading-subtitle">Connecting to server and fetching your data</p>
           <ConnectionStatus />
         </div>
       </div>
@@ -587,36 +588,28 @@ const fetchTasks = async () => {
 
   if (error && !internData) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center max-w-md">
-          <AlertCircle className="mx-auto text-red-500 mb-4" size={48} />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            Connection Error
-          </h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+      <div className="error-screen">
+        <div className="error-content">
+          <AlertCircle className="error-icon" size={48} />
+          <h2 className="error-title">Connection Error</h2>
+          <p className="error-subtitle">{error}</p>
           <ConnectionStatus />
-          <div className="mt-6 space-y-3">
-            <button
-              onClick={retryFetchAll}
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center justify-center space-x-2"
-            >
+          <div className="error-actions">
+            <button onClick={retryFetchAll} className="btn btn-primary">
               <RefreshCw size={16} />
               <span>Retry Connection</span>
             </button>
             {process.env.NODE_ENV === 'development' && (
-              <button
-                onClick={() => window.location.reload()}
-                className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-              >
+              <button onClick={() => window.location.reload()} className="btn btn-secondary">
                 Reload Page
               </button>
             )}
           </div>
           
           {process.env.NODE_ENV === 'development' && (
-            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-left">
-              <h3 className="font-medium text-yellow-800 mb-2">🔧 Development Debug Info:</h3>
-              <ul className="text-sm text-yellow-700 space-y-1">
+            <div className="debug-info">
+              <h3>🔧 Development Debug Info:</h3>
+              <ul>
                 <li>• Check if your backend server is running</li>
                 <li>• Verify proxy configuration in vite.config.js or package.json</li>
                 <li>• Check backend CORS settings</li>
@@ -630,26 +623,24 @@ const fetchTasks = async () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="dashboard-container">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg flex flex-col">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-800">Intern Portal</h2>
-          <div className="mt-2">
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <h2 className="sidebar-title">Intern Portal</h2>
+          <div className="sidebar-status">
             <ConnectionStatus />
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="sidebar-nav">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() =>
                 item.id === "logout" ? handleLogout() : setActiveNav(item.id)
               }
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                activeNav === item.id
-                  ? "bg-blue-100 text-blue-700 font-medium"
-                  : "text-gray-600 hover:bg-gray-100"
+              className={`nav-item ${
+                activeNav === item.id ? "nav-item-active" : ""
               }`}
             >
               <item.icon size={20} />
@@ -660,22 +651,22 @@ const fetchTasks = async () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="main-content">
         {/* Welcome Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-lg font-bold">
+        <div className="welcome-banner">
+          <div className="banner-content">
+            <div className="user-info">
+              <div className="user-avatar">
                 {internData?.name
                   ?.split(" ")
                   .map((n) => n[0])
                   .join("") || "IN"}
               </div>
-              <div>
-                <h1 className="text-2xl font-bold">
+              <div className="user-details">
+                <h1 className="welcome-title">
                   Welcome, {internData?.name || "Intern"}!
                 </h1>
-                <p className="text-blue-100">
+                <p className="welcome-subtitle">
                   Your training ends on:{" "}
                   {internData?.trainingEndDate || "Not set"}
                 </p>
@@ -683,11 +674,7 @@ const fetchTasks = async () => {
             </div>
             
             {error && (
-              <button
-                onClick={retryFetchAll}
-                className="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center space-x-2 text-sm"
-                title="Retry failed requests"
-              >
+              <button onClick={retryFetchAll} className="retry-button" title="Retry failed requests">
                 <RefreshCw size={16} />
                 <span>Retry</span>
               </button>
@@ -697,16 +684,13 @@ const fetchTasks = async () => {
 
         {/* Error Banner */}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4">
-            <div className="flex items-center">
-              <AlertCircle className="text-red-500 mr-3" size={20} />
-              <div className="flex-1">
-                <p className="text-red-700 text-sm">{error}</p>
+          <div className="error-banner">
+            <div className="error-banner-content">
+              <AlertCircle className="error-banner-icon" size={20} />
+              <div className="error-banner-text">
+                <p>{error}</p>
               </div>
-              <button
-                onClick={() => setError(null)}
-                className="text-red-500 hover:text-red-700"
-              >
+              <button onClick={() => setError(null)} className="error-banner-close">
                 ✕
               </button>
             </div>
@@ -714,121 +698,94 @@ const fetchTasks = async () => {
         )}
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="content-area">
           {/* Quick Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-600">
-                    Tasks Completed
-                  </h3>
-                  <p className="text-2xl font-bold text-gray-900">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-content">
+                <div className="stat-info">
+                  <h3 className="stat-label">Tasks Completed</h3>
+                  <p className="stat-value">
                     {internData?.tasksCompleted || 0} of{" "}
                     {internData?.totalTasks || 0}
                   </p>
                 </div>
-                <CheckCircle className="text-green-500" size={24} />
+                <CheckCircle className="stat-icon stat-icon-green" size={24} />
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-600">
-                    Days Remaining
-                  </h3>
-                  <p className="text-2xl font-bold text-gray-900">
+            <div className="stat-card">
+              <div className="stat-content">
+                <div className="stat-info">
+                  <h3 className="stat-label">Days Remaining</h3>
+                  <p className="stat-value">
                     {internData?.daysRemaining || 0} Days
                   </p>
                 </div>
-                <Calendar className="text-blue-500" size={24} />
+                <Calendar className="stat-icon stat-icon-primary" size={24} />
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-600">
-                    Upcoming Deadline
-                  </h3>
-                  <p className="text-sm font-medium text-gray-900">
+            <div className="stat-card">
+              <div className="stat-content">
+                <div className="stat-info">
+                  <h3 className="stat-label">Upcoming Deadline</h3>
+                  <p className="stat-value-small">
                     {internData?.upcomingDeadline || "No upcoming deadlines"}
                   </p>
                 </div>
-                <Clock className="text-orange-500" size={24} />
+                <Clock className="stat-icon stat-icon-orange" size={24} />
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-600">
-                    Certificate Progress
-                  </h3>
-                  <p className="text-2xl font-bold text-gray-900">
+            <div className="stat-card">
+              <div className="stat-content">
+                <div className="stat-info">
+                  <h3 className="stat-label">Certificate Progress</h3>
+                  <p className="stat-value">
                     {internData?.certificateProgress || 0}%
                   </p>
                 </div>
-                <Award className="text-purple-500" size={24} />
+                <Award className="stat-icon stat-icon-purple" size={24} />
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="main-grid">
             {/* Task Status Table */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    Task Status
-                  </h2>
+            <div className="main-section">
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="card-title">Task Status</h2>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
+                <div className="table-container">
+                  <table className="task-table">
+                    <thead>
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                          Task Title
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                          Assigned Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                          Due Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                          Actions
-                        </th>
+                        <th>Task Title</th>
+                        <th>Assigned Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody>
                       {tasks.length > 0 ? (
                         tasks.map((task) => (
-                          <tr key={task.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 text-sm text-gray-900">
-                              {task.title}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600">
-                              {task.dueDate}
-                            </td>
-                            <td className="px-6 py-4">
-                              <span
-                                className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(
-                                  task.status
-                                )}`}
-                              >
+                          <tr key={task.id} className="task-row">
+                            <td className="task-title">{task.title}</td>
+                            <td className="task-date">{task.assignedDate}</td>
+                            <td className="task-date">{task.dueDate}</td>
+                            <td>
+                              <span className={`status-badge ${getStatusColor(task.status)}`}>
                                 {task.status}
                               </span>
                             </td>
-                            <td className="px-6 py-4">
-                              <div className="flex space-x-2">
+                            <td>
+                              <div className="task-actions">
                                 <button
                                   onClick={() => setSelectedTask(task)}
-                                  className="text-blue-600 hover:text-blue-800"
+                                  className="action-button view-button"
                                   title="View Details"
                                 >
                                   <Eye size={16} />
@@ -836,7 +793,7 @@ const fetchTasks = async () => {
                                 {task.status === "Pending" && (
                                   <button
                                     onClick={() => setSelectedTask(task)}
-                                    className="text-green-600 hover:text-green-800"
+                                    className="action-button submit-button"
                                     title="Submit Task"
                                   >
                                     <Upload size={16} />
@@ -848,15 +805,12 @@ const fetchTasks = async () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                            <div className="flex flex-col items-center space-y-2">
-                              <FileText className="text-gray-300" size={48} />
+                          <td colSpan={5} className="empty-state">
+                            <div className="empty-content">
+                              <FileText className="empty-icon" size={48} />
                               <p>No tasks available</p>
                               {connectionStatus === 'disconnected' && (
-                                <button
-                                  onClick={retryFetchAll}
-                                  className="text-blue-600 hover:text-blue-800 text-sm"
-                                >
+                                <button onClick={retryFetchAll} className="retry-link">
                                   Retry loading tasks
                                 </button>
                               )}
@@ -871,50 +825,43 @@ const fetchTasks = async () => {
             </div>
 
             {/* Right Sidebar */}
-            <div className="space-y-6">
+            <div className="sidebar-right">
               {/* Announcements */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    📢 Announcements
-                  </h2>
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="card-title">📢 Announcements</h2>
                 </div>
-                <div className="p-6 space-y-4">
+                <div className="announcements-content">
                   {announcements.length > 0 ? (
                     announcements.map((announcement, index) => (
-                      <div
-                        key={index}
-                        className="text-sm text-gray-600 p-3 bg-blue-50 rounded-lg"
-                      >
+                      <div key={index} className="announcement-item">
                         {announcement}
                       </div>
                     ))
                   ) : (
-                    <div className="text-center text-gray-500 py-4">
-                      <Bell className="text-gray-300 mx-auto mb-2" size={32} />
-                      <p className="text-sm">No announcements yet</p>
+                    <div className="empty-announcements">
+                      <Bell className="empty-icon" size={32} />
+                      <p>No announcements yet</p>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Certificate Section */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    🎓 Certificate
-                  </h2>
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="card-title">🎓 Certificate</h2>
                 </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm text-gray-600">Progress</span>
-                    <span className="text-sm font-medium text-gray-900">
+                <div className="certificate-content">
+                  <div className="progress-header">
+                    <span className="progress-label">Progress</span>
+                    <span className="progress-value">
                       {internData?.certificateProgress || 0}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                  <div className="progress-bar">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="progress-fill"
                       style={{
                         width: `${internData?.certificateProgress || 0}%`,
                       }}
@@ -923,48 +870,43 @@ const fetchTasks = async () => {
                   <button
                     onClick={downloadCertificate}
                     disabled={internData?.certificateProgress !== 100}
-                    className={`w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    className={`download-button ${
                       internData?.certificateProgress === 100
-                        ? "bg-green-600 text-white hover:bg-green-700"
-                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                        ? "download-enabled"
+                        : "download-disabled"
                     }`}
                   >
                     <Download size={16} />
                     <span>Download Certificate</span>
                   </button>
-                  <p className="text-xs text-gray-500 mt-2 text-center">
+                  <p className="certificate-note">
                     Complete all tasks to unlock your certificate
                   </p>
                 </div>
               </div>
 
               {/* Help & Support */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    💬 Help & Support
-                  </h2>
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="card-title">💬 Help & Support</h2>
                 </div>
-                <div className="p-6">
-                  <a
-                    href="mailto:info@thevsoft.com"
-                    className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 mb-4"
-                  >
+                <div className="help-content">
+                  <a href="mailto:info@thevsoft.com" className="help-email">
                     <span>📧</span>
                     <span>info@thevsoft.com</span>
                   </a>
-                  <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
+                  <button className="live-chat-button">
                     <MessageCircle size={16} />
                     <span>Live Chat</span>
                   </button>
                   
                   {process.env.NODE_ENV === 'development' && (
-                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <h4 className="text-sm font-medium text-yellow-800 mb-1">🔧 Debug Actions</h4>
-                      <div className="space-y-2">
+                    <div className="debug-section">
+                      <h4>🔧 Debug Actions</h4>
+                      <div className="debug-actions">
                         <button
                           onClick={testConnection}
-                          className="w-full text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded"
+                          className="debug-button debug-test"
                         >
                           Test Connection
                         </button>
@@ -979,7 +921,7 @@ const fetchTasks = async () => {
                               error
                             });
                           }}
-                          className="w-full text-xs bg-green-100 text-green-700 px-2 py-1 rounded"
+                          className="debug-button debug-log"
                         >
                           Log State
                         </button>
@@ -988,7 +930,7 @@ const fetchTasks = async () => {
                             localStorage.clear();
                             window.location.reload();
                           }}
-                          className="w-full text-xs bg-red-100 text-red-700 px-2 py-1 rounded"
+                          className="debug-button debug-clear"
                         >
                           Clear Storage & Reload
                         </button>
@@ -1001,47 +943,40 @@ const fetchTasks = async () => {
           </div>
 
           {/* Training Progress Timeline */}
-          <div className="mt-8">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-800">
-                  🛣️ Training Progress Timeline
-                </h2>
+          <div className="timeline-section">
+            <div className="card">
+              <div className="card-header">
+                <h2 className="card-title">🛣️ Training Progress Timeline</h2>
               </div>
-              <div className="p-6">
+              <div className="timeline-content">
                 {timelineSteps.length > 0 ? (
-                  <div className="flex flex-wrap justify-between items-center space-y-4 md:space-y-0">
+                  <div className="timeline-container">
                     {timelineSteps.map((step, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-col items-center space-y-2 relative"
-                      >
+                      <div key={index} className="timeline-step">
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                          className={`timeline-marker ${
                             step.status === "completed"
-                              ? "bg-green-500 text-white"
+                              ? "timeline-completed"
                               : step.status === "current"
-                              ? "bg-blue-500 text-white"
-                              : "bg-gray-200 text-gray-500"
+                              ? "timeline-current"
+                              : "timeline-pending"
                           }`}
                         >
                           {index + 1}
                         </div>
-                        <div className="text-center">
-                          <h3 className="text-sm font-medium text-gray-800">
-                            {step.title}
-                          </h3>
-                          <p className="text-xs text-gray-500">{step.date}</p>
+                        <div className="timeline-info">
+                          <h3 className="timeline-title">{step.title}</h3>
+                          <p className="timeline-date">{step.date}</p>
                         </div>
                         {index < timelineSteps.length - 1 && (
-                          <div className="hidden md:block absolute top-4 left-full w-16 h-0.5 bg-gray-200 transform translate-x-4"></div>
+                          <div className="timeline-connector"></div>
                         )}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center text-gray-500 py-8">
-                    <Calendar className="text-gray-300 mx-auto mb-2" size={48} />
+                  <div className="empty-timeline">
+                    <Calendar className="empty-icon" size={48} />
                     <p>Timeline not available</p>
                   </div>
                 )}
@@ -1053,84 +988,60 @@ const fetchTasks = async () => {
 
       {/* Task Details Modal */}
       {selectedTask && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">
-                {selectedTask.title}
-              </h2>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2 className="modal-title">{selectedTask.title}</h2>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Task Description
-                  </label>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+            <div className="modal-body">
+              <div className="modal-section">
+                <div className="form-group">
+                  <label className="form-label">Task Description</label>
+                  <p className="task-description">
                     {selectedTask.description || "No description provided"}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Due Date
-                    </label>
-                    <p className="text-sm text-gray-600">
-                      {selectedTask.dueDate}
-                    </p>
+                <div className="modal-grid">
+                  <div className="form-group">
+                    <label className="form-label">Due Date</label>
+                    <p className="form-value">{selectedTask.dueDate}</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Status
-                    </label>
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(
-                        selectedTask.status
-                      )}`}
-                    >
+                  <div className="form-group">
+                    <label className="form-label">Status</label>
+                    <span className={`status-badge ${getStatusColor(selectedTask.status)}`}>
                       {selectedTask.status}
                     </span>
                   </div>
                 </div>
 
                 {selectedTask.feedback && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Feedback
-                    </label>
-                    <p className="text-sm text-gray-600 bg-yellow-50 p-3 rounded-lg">
-                      {selectedTask.feedback}
-                    </p>
+                  <div className="form-group">
+                    <label className="form-label">Feedback</label>
+                    <p className="feedback-text">{selectedTask.feedback}</p>
                   </div>
                 )}
 
                 {selectedTask.status === "Pending" && (
-                  <div className="border-t pt-4">
-                    <h3 className="text-lg font-medium text-gray-800 mb-4">
-                      Submit Task
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Submission Text
-                        </label>
+                  <div className="submission-section">
+                    <h3 className="submission-title">Submit Task</h3>
+                    <div className="submission-form">
+                      <div className="form-group">
+                        <label className="form-label">Submission Text</label>
                         <textarea
                           value={submissionText}
                           onChange={(e) => setSubmissionText(e.target.value)}
                           rows={4}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="form-textarea"
                           placeholder="Enter your submission details..."
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Upload File (Optional)
-                        </label>
+                      <div className="form-group">
+                        <label className="form-label">Upload File (Optional)</label>
                         <input
                           type="file"
                           onChange={(e) => setSubmissionFile(e.target.files[0])}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="form-file"
                           accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
                         />
                       </div>
@@ -1139,10 +1050,10 @@ const fetchTasks = async () => {
                 )}
               </div>
             </div>
-            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+            <div className="modal-footer">
               <button
                 onClick={() => setSelectedTask(null)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="btn btn-secondary"
               >
                 Close
               </button>
@@ -1150,9 +1061,9 @@ const fetchTasks = async () => {
                 <button
                   onClick={() => submitTask(selectedTask.id)}
                   disabled={submitting || !submissionText.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  className="btn btn-primary"
                 >
-                  {submitting && <Loader className="animate-spin" size={16} />}
+                  {submitting && <Loader className="btn-spinner" size={16} />}
                   <span>{submitting ? "Submitting..." : "Submit Task"}</span>
                 </button>
               )}
@@ -1165,4 +1076,3 @@ const fetchTasks = async () => {
 };
 
 export default InternDashboard;
-                              

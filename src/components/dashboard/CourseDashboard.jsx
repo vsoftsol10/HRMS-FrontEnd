@@ -203,14 +203,14 @@ const CourseDashboard = () => {
   const handleEnrollment = (courseId) => {
     // Add your enrollment logic here
     console.log(`Enrolling in course ${courseId}`);
-    alert(`Enrollment initiated for ${selectedCourse.title}. Please contact us for more details.`);
+    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdtW3UbEpW_1bzr_81qEgzdF-JDN-bfgv23s9zVdQ8grAJ4YQ/viewform", "_blank");
   };
 
-  // Handle contact us (you can customize this)
-  const handleContactUs = () => {
-    // Add your contact logic here
-    alert('Redirecting to contact form...');
-  };
+  // // Handle contact us (you can customize this)
+  // const handleContactUs = () => {
+  //   // Add your contact logic here
+  //   alert('Redirecting to contact form...');
+  // };
 
   if (loading) {
     return (
@@ -388,12 +388,12 @@ const CourseDashboard = () => {
               >
                 Enroll Now
               </button>
-              <button 
+              {/* <button 
                 className="contact-btn" 
                 onClick={handleContactUs}
               >
                 Contact Us
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

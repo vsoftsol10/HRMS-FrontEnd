@@ -59,30 +59,24 @@ const EmployeeDashboard1 = () => {
         <nav className="emp-sidebar-nav">
           <ul>
             <li className="emp-nav-item emp-active">
-              <span className="emp-nav-icon">📊</span>
               Dashboard
             </li>
             <li className="emp-nav-item" onClick={handleMyProfileClick}>
-              <span className="emp-nav-icon">👤</span>
               My Profile
             </li>
             <li className="emp-nav-item">
-              <span className="emp-nav-icon">🕒</span>
               Attendance
             </li>
             <li className="emp-nav-item">
-              <span className="emp-nav-icon">📝</span>
               Leave Requests
             </li>
             <li
               className="emp-nav-item"
               onClick={() => navigate(`/payslip/${employeeInfo.id}`)}
             >
-              <span className="emp-nav-icon">💰</span>
               Payslips
             </li>
             <li className="emp-nav-item">
-              <span className="emp-nav-icon">📋</span>
               Policies
             </li>
           </ul>

@@ -1,4 +1,5 @@
-/* PayslipGenerator.css */
+/* PayslipGenerator.css - Updated with Custom Color Scheme */
+/* Colors: #793a71 (primary purple), #d8c8d8 (light purple), #941484 (accent purple), white */
 
 /* Overlay and Container */
 .payslip-overlay {
@@ -7,7 +8,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(121, 58, 113, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,11 +19,12 @@
 .payslip-container {
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(121, 58, 113, 0.35);
   max-width: 1024px;
   width: 100%;
   max-height: 100vh;
   overflow-y: auto;
+  border: 2px solid #793a71;
 }
 
 /* Loading States */
@@ -30,6 +32,7 @@
   background-color: white;
   border-radius: 8px;
   padding: 32px;
+  border: 1px solid #d8c8d8;
 }
 
 .loading-content {
@@ -41,8 +44,8 @@
 .loading-spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid #e5e7eb;
-  border-bottom: 2px solid #2563eb;
+  border: 2px solid #d8c8d8;
+  border-bottom: 2px solid #793a71;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -54,7 +57,7 @@
 }
 
 .loading-text {
-  color: #374151;
+  color: #793a71;
 }
 
 /* Error States */
@@ -65,6 +68,7 @@
   max-width: 448px;
   width: 100%;
   margin: 0 16px;
+  border: 1px solid #941484;
 }
 
 .error-content {
@@ -72,7 +76,7 @@
 }
 
 .error-icon {
-  color: #ef4444;
+  color: #941484;
   font-size: 24px;
   margin-bottom: 8px;
 }
@@ -80,19 +84,19 @@
 .error-title {
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: #793a71;
   margin-bottom: 8px;
 }
 
 .error-message {
-  color: #6b7280;
+  color: #793a71;
   margin-bottom: 16px;
 }
 
 .error-button {
   padding: 8px 16px;
-  background-color: #6b7280;
-  color: rgb(192, 37, 37);
+  background-color: #793a71;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -100,7 +104,7 @@
 }
 
 .error-button:hover {
-  background-color: #4b5563;
+  background-color: #941484;
 }
 
 /* Header */
@@ -109,14 +113,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px;
-  border-bottom: 1px solid #e5e7eb;
-  background-color: #f9fafb;
+  border-bottom: 1px solid #d8c8d8;
+  background: linear-gradient(135deg, #793a71 0%, #941484 100%);
+  color: white;
 }
 
 .payslip-title {
   font-size: 20px;
   font-weight: 600;
-  color: #111827;
+  color: white;
   margin: 0;
 }
 
@@ -138,59 +143,63 @@
   transition: background-color 0.2s;
 }
 
-.action-btn-close-btn{
-  color: red;
-  background-color: rgb(241, 177, 177);
-  padding: 15px;
+.action-btn-close-btn {
+  color: #941484;
+  background-color: #d8c8d8;
+  padding: 20px;
   height: 20px;
   justify-content: center;
   align-items: center;
   margin-right: 5px;
-  border-top-left-radius: 15px;
-  border-top-right-radius:  15px;
-
+  border-radius:  15px;
+  padding-bottom: 30px;
 }
 
-.action-btn-close-btn,
+.action-btn-close-btn:hover {
+  background-color: #941484;
+  color: white;
+}
+
 .btn-icon {
   width: 16px;
   height: 16px;
 }
 
 .print-btn {
-  background-color: #2563eb;
+  background-color: #793a71;
   color: white;
 }
 
 .print-btn:hover {
-  background-color: #1d4ed8;
+  background-color: #941484;
 }
 
 .download-btn {
-  background-color: #059669;
+  background-color: #9e5494;
   color: white;
 }
 
 .download-btn:hover {
-  background-color: #047857;
+  background-color: #793a71;
 }
 
 .email-btn {
-  background-color: #7c3aed;
-  color: white;
+  background-color: #d8c8d8;
+  color: #793a71;
 }
 
 .email-btn:hover {
-  background-color: #6d28d9;
+  background-color: #793a71;
+  color: white;
 }
 
 .close-btn {
-  background-color: #6b7280;
+  background-color: #793a71;
   color: white;
 }
 
 .close-btn:hover {
-  background-color: #4b5563;
+  background-color: #941484;
 }
 
 /* Payslip Content */
@@ -205,12 +214,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #8B5A96 0%, #6A4C93 100%);
+  background: linear-gradient(135deg, #793a71 0%, #941484 100%);
   color: white;
   padding: 25px 30px;
   border-radius: 8px 8px 0 0;
   margin-bottom: 0;
   min-height: 80px;
+  box-shadow: 0 4px 12px rgba(121, 58, 113, 0.3);
 }
 
 .company-logo-section {
@@ -220,7 +230,7 @@
 }
 
 .company-logo {
-  width: 180px;
+  width: 80px;
   height: 80px;
   background-color: white;
   border-radius: 12px;
@@ -228,13 +238,14 @@
   align-items: center;
   justify-content: center;
   padding: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(121, 58, 113, 0.2);
+  border: 2px solid #d8c8d8;
 }
 
 .logo-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: contain !important;
   border-radius: 8px;
 }
 
@@ -249,14 +260,14 @@
 
 .company-address {
   font-size: 14px;
-  opacity: 0.9;
+  opacity: 0.95;
   max-width: 250px;
   line-height: 1.4;
 }
 
 .company-contact {
   font-size: 13px;
-  opacity: 0.8;
+  opacity: 0.9;
   font-weight: 500;
 }
 
@@ -271,10 +282,10 @@
 
 /* Payslip Title Section */
 .payslip-title-section {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #d8c8d8 0%, white 100%);
   text-align: center;
   padding: 15px;
-  border: 2px solid #000;
+  border: 2px solid #793a71;
   border-top: none;
   margin-bottom: 0;
 }
@@ -283,7 +294,7 @@
   font-size: 22px;
   font-weight: bold;
   margin: 0;
-  color: #000;
+  color: #793a71;
   letter-spacing: 1px;
 }
 
@@ -295,25 +306,27 @@
 .info-table {
   width: 100%;
   border-collapse: collapse;
-  border: 2px solid #000;
+  border: 2px solid #793a71;
   border-top: none;
 }
 
 .info-table td {
   padding: 12px 15px;
-  border: 1px solid #000;
+  border: 1px solid #793a71;
   font-size: 14px;
 }
 
 .info-label {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #d8c8d8 0%, #f8f9fa 100%);
   font-weight: bold;
   width: 25%;
+  color: #793a71;
 }
 
 .info-value {
   background-color: white;
   width: 25%;
+  color: #333;
 }
 
 /* Earnings and Deductions Table */
@@ -324,38 +337,39 @@
 .payroll-table {
   width: 100%;
   border-collapse: collapse;
-  border: 2px solid #000;
+  border: 2px solid #793a71;
   border-top: none;
 }
 
 .payroll-table th {
   padding: 12px 15px;
-  border: 1px solid #000;
+  border: 1px solid #793a71;
   font-size: 16px;
   font-weight: bold;
   text-align: center;
 }
 
 .earnings-header {
-  background-color: #e8f5e8;
-  color: #2d5a2d;
+  background: linear-gradient(135deg, #d8c8d8 0%, #e8f5e8 50%);
+  color: #793a71;
 }
 
 .deductions-header {
-  background-color: #ffe8e8;
-  color: #5a2d2d;
+  background: linear-gradient(135deg, #d8c8d8 0%, #ffe8e8 50%);
+  color: #941484;
 }
 
 .payroll-table td {
   padding: 10px 15px;
-  border: 1px solid #000;
+  border: 1px solid #793a71;
   font-size: 14px;
 }
 
 .item-label {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #d8c8d8 0%, #f8f9fa 100%);
   font-weight: 500;
   width: 25%;
+  color: #793a71;
 }
 
 .amount-value {
@@ -363,21 +377,25 @@
   text-align: right;
   font-weight: 500;
   width: 25%;
+  color: #333;
 }
 
 .total-row {
-  background-color: #f0f0f0;
+  background: linear-gradient(135deg, #793a71 0%, #941484 100%);
+  color: white;
 }
 
 .total-label {
-  background-color: #e0e0e0 !important;
+  background: linear-gradient(135deg, #793a71 0%, #941484 100%) !important;
   font-weight: bold;
+  color: white !important;
 }
 
 .total-amount {
-  background-color: #e0e0e0 !important;
+  background: linear-gradient(135deg, #793a71 0%, #941484 100%) !important;
   text-align: right;
   font-weight: bold;
+  color: white !important;
 }
 
 /* Net Salary Section */
@@ -388,38 +406,42 @@
 .net-salary-table {
   width: 100%;
   border-collapse: collapse;
-  border: 2px solid #000;
+  border: 2px solid #793a71;
   border-top: none;
 }
 
 .net-salary-table td {
   padding: 15px;
-  border: 1px solid #000;
+  border: 1px solid #793a71;
   font-size: 16px;
   text-align: center;
-  background-color: #f0f8ff;
+  background: linear-gradient(135deg, #d8c8d8 0%, white 100%);
 }
 
 .net-salary-label {
   width: 50%;
   font-weight: bold;
+  color: #793a71;
 }
 
 .net-salary-amount {
   width: 50%;
   font-weight: bold;
   font-size: 18px;
-  color: #2563eb;
+  color: #941484;
 }
 
 /* Footer */
 .payslip-footer-new {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 2px solid #d8c8d8;
   text-align: center;
   font-size: 12px;
-  color: #6b7280;
+  color: #793a71;
+  background: linear-gradient(135deg, #f8f9fa 0%, white 100%);
+  padding: 20px;
+  border-radius: 0 0 8px 8px;
 }
 
 .payslip-footer-new p {
@@ -429,6 +451,7 @@
 .generated-date {
   margin-top: 8px !important;
   font-weight: 500;
+  color: #941484;
 }
 
 /* Print Styles */
@@ -444,6 +467,7 @@
     max-height: none;
     overflow: visible;
     border-radius: 0;
+    border: none;
   }
   
   .payslip-header {
@@ -457,25 +481,48 @@
   .company-header-new {
     margin-bottom: 0;
     border-radius: 0;
+    box-shadow: none;
   }
   
   .payslip-footer-new {
     margin-top: 16px;
     padding-top: 16px;
+    background: none;
+    border-radius: 0;
   }
   
   /* Ensure table borders print correctly */
   .info-table,
   .payroll-table,
   .net-salary-table {
-    border: 2px solid #000 !important;
+    border: 2px solid #793a71 !important;
   }
   
   .info-table td,
   .payroll-table th,
   .payroll-table td,
   .net-salary-table td {
-    border: 1px solid #000 !important;
+    border: 1px solid #793a71 !important;
+  }
+  
+  /* Ensure gradients are printer-friendly */
+  .company-header-new {
+    background: #793a71 !important;
+  }
+  
+  .info-label,
+  .item-label {
+    background: #d8c8d8 !important;
+  }
+  
+  .total-row,
+  .total-label,
+  .total-amount {
+    background: #793a71 !important;
+  }
+  
+  .net-salary-table td {
+    background: #d8c8d8 !important;
   }
 }
 
@@ -578,4 +625,41 @@
   .company-contact {
     font-size: 11px;
   }
+}
+
+/* Additional Hover Effects for Interactive Elements */
+.payslip-container {
+  transition: box-shadow 0.3s ease;
+}
+
+.payslip-container:hover {
+  box-shadow: 0 25px 50px -12px rgba(148, 20, 132, 0.4);
+}
+
+.action-btn {
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(121, 58, 113, 0.3);
+}
+
+/* Custom Scrollbar */
+.payslip-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.payslip-container::-webkit-scrollbar-track {
+  background: #d8c8d8;
+  border-radius: 4px;
+}
+
+.payslip-container::-webkit-scrollbar-thumb {
+  background: #793a71;
+  border-radius: 4px;
+}
+
+.payslip-container::-webkit-scrollbar-thumb:hover {
+  background: #941484;
 }

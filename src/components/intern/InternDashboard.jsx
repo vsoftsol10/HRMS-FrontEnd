@@ -523,17 +523,17 @@ const fetchTasks = async () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
-        return "status-pending";
+        return "idp-status-pending";
       case "In Progress":
-        return "status-in-progress";
+        return "idp-status-in-progress";
       case "Completed":
-        return "status-completed";
+        return "idp-status-completed";
       case "Submitted":
-        return "status-submitted";
+        return "idp-status-submitted";
       case "Approved":
-        return "status-approved";
+        return "idp-status-approved";
       default:
-        return "status-default";
+        return "idp-status-default";
     }
   };
 
@@ -552,21 +552,21 @@ const fetchTasks = async () => {
     const getStatusInfo = () => {
       switch (connectionStatus) {
         case 'connected':
-          return { icon: Wifi, color: 'status-connected', text: 'Connected' };
+          return { icon: Wifi, color: 'idp-status-connected', text: 'Connected' };
         case 'disconnected':
-          return { icon: WifiOff, color: 'status-disconnected', text: 'Disconnected' };
+          return { icon: WifiOff, color: 'idp-status-disconnected', text: 'Disconnected' };
         case 'checking':
-          return { icon: Loader, color: 'status-checking', text: 'Connecting...', animate: true };
+          return { icon: Loader, color: 'idp-status-checking', text: 'Connecting...', animate: true };
         default:
-          return { icon: AlertCircle, color: 'status-unknown', text: 'Unknown' };
+          return { icon: AlertCircle, color: 'idp-status-unknown', text: 'Unknown' };
       }
     };
 
     const { icon: Icon, color, text, animate } = getStatusInfo();
 
     return (
-      <div className={`connection-status ${color}`}>
-        <Icon size={16} className={animate ? 'animate-spin' : ''} />
+      <div className={`idp-connection-status ${color}`}>
+        <Icon size={16} className={animate ? 'idp-animate-spin' : ''} />
         <span>{text}</span>
       </div>
     );
@@ -574,11 +574,11 @@ const fetchTasks = async () => {
 
   if (loading) {
     return (
-      <div className="loading-screen">
-        <div className="loading-content">
-          <Loader className="loading-spinner" size={48} />
-          <h2 className="loading-title">Loading Dashboard...</h2>
-          <p className="loading-subtitle">Connecting to server and fetching your data</p>
+      <div className="idp-loading-screen">
+        <div className="idp-loading-content">
+          <Loader className="idp-loading-spinner" size={48} />
+          <h2 className="idp-loading-title">Loading Dashboard...</h2>
+          <p className="idp-loading-subtitle">Connecting to server and fetching your data</p>
           <ConnectionStatus />
         </div>
       </div>
@@ -587,26 +587,26 @@ const fetchTasks = async () => {
 
   if (error && !internData) {
     return (
-      <div className="error-screen">
-        <div className="error-content">
-          <AlertCircle className="error-icon" size={48} />
-          <h2 className="error-title">Connection Error</h2>
-          <p className="error-subtitle">{error}</p>
+      <div className="idp-error-screen">
+        <div className="idp-error-content">
+          <AlertCircle className="idp-error-icon" size={48} />
+          <h2 className="idp-error-title">Connection Error</h2>
+          <p className="idp-error-subtitle">{error}</p>
           <ConnectionStatus />
-          <div className="error-actions">
-            <button onClick={retryFetchAll} className="btn btn-primary">
+          <div className="idp-error-actions">
+            <button onClick={retryFetchAll} className="idp-btn idp-btn-primary">
               <RefreshCw size={16} />
               <span>Retry Connection</span>
             </button>
             {process.env.NODE_ENV === 'development' && (
-              <button onClick={() => window.location.reload()} className="btn btn-secondary">
+              <button onClick={() => window.location.reload()} className="idp-btn idp-btn-secondary">
                 Reload Page
               </button>
             )}
           </div>
           
           {process.env.NODE_ENV === 'development' && (
-            <div className="debug-info">
+            <div className="idp-debug-info">
               <h3>🔧 Development Debug Info:</h3>
               <ul>
                 <li>• Check if your backend server is running</li>
@@ -622,24 +622,24 @@ const fetchTasks = async () => {
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="idp-dashboard-container">
       {/* Sidebar */}
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <h2 className="sidebar-title">Intern Portal</h2>
-          <div className="sidebar-status">
+      <div className="idp-sidebar">
+        <div className="idp-sidebar-header">
+          <h2 className="idp-sidebar-title">Intern Portal</h2>
+          <div className="idp-sidebar-status">
             <ConnectionStatus />
           </div>
         </div>
-        <nav className="sidebar-nav">
+        <nav className="idp-sidebar-nav">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() =>
                 item.id === "logout" ? handleLogout() : setActiveNav(item.id)
               }
-              className={`nav-item ${
-                activeNav === item.id ? "nav-item-active" : ""
+              className={`idp-nav-item ${
+                activeNav === item.id ? "idp-nav-item-active" : ""
               }`}
             >
               <item.icon size={20} />
@@ -650,22 +650,22 @@ const fetchTasks = async () => {
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div className="idp-main-content">
         {/* Welcome Banner */}
-        <div className="welcome-banner">
-          <div className="banner-content">
-            <div className="user-info">
-              <div className="user-avatar">
+        <div className="idp-welcome-banner">
+          <div className="idp-banner-content">
+            <div className="idp-user-info">
+              <div className="idp-user-avatar">
                 {internData?.name
                   ?.split(" ")
                   .map((n) => n[0])
                   .join("") || "IN"}
               </div>
-              <div className="user-details">
-                <h1 className="welcome-title">
+              <div className="idp-user-details">
+                <h1 className="idp-welcome-title">
                   Welcome, {internData?.name || "Intern"}!
                 </h1>
-                <p className="welcome-subtitle">
+                <p className="idp-welcome-subtitle">
                   Your training ends on:{" "}
                   {internData?.trainingEndDate || "Not set"}
                 </p>
@@ -673,7 +673,7 @@ const fetchTasks = async () => {
             </div>
             
             {error && (
-              <button onClick={retryFetchAll} className="retry-button" title="Retry failed requests">
+              <button onClick={retryFetchAll} className="idp-retry-button" title="Retry failed requests">
                 <RefreshCw size={16} />
                 <span>Retry</span>
               </button>
@@ -683,13 +683,13 @@ const fetchTasks = async () => {
 
         {/* Error Banner */}
         {error && (
-          <div className="error-banner">
-            <div className="error-banner-content">
-              <AlertCircle className="error-banner-icon" size={20} />
-              <div className="error-banner-text">
+          <div className="idp-error-banner">
+            <div className="idp-error-banner-content">
+              <AlertCircle className="idp-error-banner-icon" size={20} />
+              <div className="idp-error-banner-text">
                 <p>{error}</p>
               </div>
-              <button onClick={() => setError(null)} className="error-banner-close">
+              <button onClick={() => setError(null)} className="idp-error-banner-close">
                 ✕
               </button>
             </div>
@@ -697,68 +697,68 @@ const fetchTasks = async () => {
         )}
 
         {/* Content Area */}
-        <div className="content-area">
+        <div className="idp-content-area">
           {/* Quick Stats Cards */}
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-content">
-                <div className="stat-info">
-                  <h3 className="stat-label">Tasks Completed</h3>
-                  <p className="stat-value">
+          <div className="idp-stats-grid">
+            <div className="idp-stat-card">
+              <div className="idp-stat-content">
+                <div className="idp-stat-info">
+                  <h3 className="idp-stat-label">Tasks Completed</h3>
+                  <p className="idp-stat-value">
                     {internData?.tasksCompleted || 0} of{" "}
                     {internData?.totalTasks || 0}
                   </p>
                 </div>
-                <CheckCircle className="stat-icon stat-icon-green" size={24} />
+                <CheckCircle className="idp-stat-icon idp-stat-icon-green" size={24} />
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-content">
-                <div className="stat-info">
-                  <h3 className="stat-label">Days Remaining</h3>
-                  <p className="stat-value">
+            <div className="idp-stat-card">
+              <div className="idp-stat-content">
+                <div className="idp-stat-info">
+                  <h3 className="idp-stat-label">Days Remaining</h3>
+                  <p className="idp-stat-value">
                     {internData?.daysRemaining || 0} Days
                   </p>
                 </div>
-                <Calendar className="stat-icon stat-icon-primary" size={24} />
+                <Calendar className="idp-stat-icon idp-stat-icon-primary" size={24} />
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-content">
-                <div className="stat-info">
-                  <h3 className="stat-label">Upcoming Deadline</h3>
-                  <p className="stat-value-small">
+            <div className="idp-stat-card">
+              <div className="idp-stat-content">
+                <div className="idp-stat-info">
+                  <h3 className="idp-stat-label">Upcoming Deadline</h3>
+                  <p className="idp-stat-value-small">
                     {internData?.upcomingDeadline || "No upcoming deadlines"}
                   </p>
                 </div>
-                <Clock className="stat-icon stat-icon-orange" size={24} />
+                <Clock className="idp-stat-icon idp-stat-icon-orange" size={24} />
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-content">
-                <div className="stat-info">
-                  <h3 className="stat-label">Certificate Progress</h3>
-                  <p className="stat-value">
+            <div className="idp-stat-card">
+              <div className="idp-stat-content">
+                <div className="idp-stat-info">
+                  <h3 className="idp-stat-label">Certificate Progress</h3>
+                  <p className="idp-stat-value">
                     {internData?.certificateProgress || 0}%
                   </p>
                 </div>
-                <Award className="stat-icon stat-icon-purple" size={24} />
+                <Award className="idp-stat-icon idp-stat-icon-purple" size={24} />
               </div>
             </div>
           </div>
 
-          <div className="main-grid">
+          <div className="idp-main-grid">
             {/* Task Status Table */}
-            <div className="main-section">
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="card-title">Task Status</h2>
+            <div className="idp-main-section">
+              <div className="idp-card">
+                <div className="idp-card-header">
+                  <h2 className="idp-card-title">Task Status</h2>
                 </div>
-                <div className="table-container">
-                  <table className="task-table">
+                <div className="idp-table-container">
+                  <table className="idp-task-table">
                     <thead>
                       <tr>
                         <th>Task Title</th>
@@ -771,20 +771,20 @@ const fetchTasks = async () => {
                     <tbody>
                       {tasks.length > 0 ? (
                         tasks.map((task) => (
-                          <tr key={task.id} className="task-row">
-                            <td className="task-title">{task.title}</td>
-                            <td className="task-date">{task.assignedDate}</td>
-                            <td className="task-date">{task.dueDate}</td>
+                          <tr key={task.id} className="idp-task-row">
+                            <td className="idp-task-title">{task.title}</td>
+                            <td className="idp-task-date">{task.assignedDate}</td>
+                            <td className="idp-task-date">{task.dueDate}</td>
                             <td>
-                              <span className={`status-badge ${getStatusColor(task.status)}`}>
+                              <span className={`idp-status-badge ${getStatusColor(task.status)}`}>
                                 {task.status}
                               </span>
                             </td>
                             <td>
-                              <div className="task-actions">
+                              <div className="idp-task-actions">
                                 <button
                                   onClick={() => setSelectedTask(task)}
-                                  className="action-button view-button"
+                                  className="idp-action-button idp-view-button"
                                   title="View Details"
                                 >
                                   <Eye size={16} />
@@ -792,7 +792,7 @@ const fetchTasks = async () => {
                                 {task.status === "Pending" && (
                                   <button
                                     onClick={() => setSelectedTask(task)}
-                                    className="action-button submit-button"
+                                    className="idp-action-button idp-submit-button"
                                     title="Submit Task"
                                   >
                                     <Upload size={16} />
@@ -804,12 +804,12 @@ const fetchTasks = async () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={5} className="empty-state">
-                            <div className="empty-content">
-                              <FileText className="empty-icon" size={48} />
+                          <td colSpan={5} className="idp-empty-state">
+                            <div className="idp-empty-content">
+                              <FileText className="idp-empty-icon" size={48} />
                               <p>No tasks available</p>
                               {connectionStatus === 'disconnected' && (
-                                <button onClick={retryFetchAll} className="retry-link">
+                                <button onClick={retryFetchAll} className="idp-retry-link">
                                   Retry loading tasks
                                 </button>
                               )}
@@ -824,22 +824,22 @@ const fetchTasks = async () => {
             </div>
 
             {/* Right Sidebar */}
-            <div className="sidebar-right">
+            <div className="idp-sidebar-right">
               {/* Announcements */}
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="card-title">📢 Announcements</h2>
+              <div className="idp-card">
+                <div className="idp-card-header">
+                  <h2 className="idp-card-title">📢 Announcements</h2>
                 </div>
-                <div className="announcements-content">
+                <div className="idp-announcements-content">
                   {announcements.length > 0 ? (
                     announcements.map((announcement, index) => (
-                      <div key={index} className="announcement-item">
+                      <div key={index} className="idp-announcement-item">
                         {announcement}
                       </div>
                     ))
                   ) : (
-                    <div className="empty-announcements">
-                      <Bell className="empty-icon" size={32} />
+                    <div className="idp-empty-announcements">
+                      <Bell className="idp-empty-icon" size={32} />
                       <p>No announcements yet</p>
                     </div>
                   )}
@@ -847,20 +847,20 @@ const fetchTasks = async () => {
               </div>
 
               {/* Certificate Section */}
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="card-title">🎓 Certificate</h2>
+              <div className="idp-card">
+                <div className="idp-card-header">
+                  <h2 className="idp-card-title">🎓 Certificate</h2>
                 </div>
-                <div className="certificate-content">
-                  <div className="progress-header">
-                    <span className="progress-label">Progress</span>
-                    <span className="progress-value">
+                <div className="idp-certificate-content">
+                  <div className="idp-progress-header">
+                    <span className="idp-progress-label">Progress</span>
+                    <span className="idp-progress-value">
                       {internData?.certificateProgress || 0}%
                     </span>
                   </div>
-                  <div className="progress-bar">
+                  <div className="idp-progress-bar">
                     <div
-                      className="progress-fill"
+                      className="idp-progress-fill"
                       style={{
                         width: `${internData?.certificateProgress || 0}%`,
                       }}
@@ -869,43 +869,43 @@ const fetchTasks = async () => {
                   <button
                     onClick={downloadCertificate}
                     disabled={internData?.certificateProgress !== 100}
-                    className={`download-button ${
+                    className={`idp-download-button ${
                       internData?.certificateProgress === 100
-                        ? "download-enabled"
-                        : "download-disabled"
+                        ? "idp-download-enabled"
+                        : "idp-download-disabled"
                     }`}
                   >
                     <Download size={16} />
                     <span>Download Certificate</span>
                   </button>
-                  <p className="certificate-note">
+                  <p className="idp-certificate-note">
                     Complete all tasks to unlock your certificate
                   </p>
                 </div>
               </div>
 
               {/* Help & Support */}
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="card-title">💬 Help & Support</h2>
+              <div className="idp-card">
+                <div className="idp-card-header">
+                  <h2 className="idp-card-title">💬 Help & Support</h2>
                 </div>
-                <div className="help-content">
-                  <a href="mailto:info@thevsoft.com" className="help-email">
+                <div className="idp-help-content">
+                  <a href="mailto:info@thevsoft.com" className="idp-help-email">
                     <span>📧</span>
                     <span>info@thevsoft.com</span>
                   </a>
-                  <button className="live-chat-button">
+                  <button className="idp-live-chat-button">
                     <MessageCircle size={16} />
                     <span>Live Chat</span>
                   </button>
                   
                   {process.env.NODE_ENV === 'development' && (
-                    <div className="debug-section">
+                    <div className="idp-debug-section">
                       <h4>🔧 Debug Actions</h4>
-                      <div className="debug-actions">
+                      <div className="idp-debug-actions">
                         <button
                           onClick={testConnection}
-                          className="debug-button debug-test"
+                          className="idp-debug-button idp-debug-test"
                         >
                           Test Connection
                         </button>
@@ -920,7 +920,7 @@ const fetchTasks = async () => {
                               error
                             });
                           }}
-                          className="debug-button debug-log"
+                          className="idp-debug-button idp-debug-log"
                         >
                           Log State
                         </button>
@@ -929,7 +929,7 @@ const fetchTasks = async () => {
                             localStorage.clear();
                             window.location.reload();
                           }}
-                          className="debug-button debug-clear"
+                          className="idp-debug-button idp-debug-clear"
                         >
                           Clear Storage & Reload
                         </button>
@@ -942,40 +942,40 @@ const fetchTasks = async () => {
           </div>
 
           {/* Training Progress Timeline */}
-          <div className="timeline-section">
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">🛣️ Training Progress Timeline</h2>
+          <div className="idp-timeline-section">
+            <div className="idp-card">
+              <div className="idp-card-header">
+                <h2 className="idp-card-title">🛣️ Training Progress Timeline</h2>
               </div>
-              <div className="timeline-content">
+              <div className="idp-timeline-content">
                 {timelineSteps.length > 0 ? (
-                  <div className="timeline-container">
+                  <div className="idp-timeline-container">
                     {timelineSteps.map((step, index) => (
-                      <div key={index} className="timeline-step">
+                      <div key={index} className="idp-timeline-step">
                         <div
-                          className={`timeline-marker ${
+                          className={`idp-timeline-marker ${
                             step.status === "completed"
-                              ? "timeline-completed"
+                              ? "idp-timeline-completed"
                               : step.status === "current"
-                              ? "timeline-current"
-                              : "timeline-pending"
+                              ? "idp-timeline-current"
+                              : "idp-timeline-pending"
                           }`}
                         >
                           {index + 1}
                         </div>
-                        <div className="timeline-info">
-                          <h3 className="timeline-title">{step.title}</h3>
-                          <p className="timeline-date">{step.date}</p>
+                        <div className="idp-timeline-info">
+                          <h3 className="idp-timeline-title">{step.title}</h3>
+                          <p className="idp-timeline-date">{step.date}</p>
                         </div>
                         {index < timelineSteps.length - 1 && (
-                          <div className="timeline-connector"></div>
+                          <div className="idp-timeline-connector"></div>
                         )}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="empty-timeline">
-                    <Calendar className="empty-icon" size={48} />
+                  <div className="idp-empty-timeline">
+                    <Calendar className="idp-empty-icon" size={48} />
                     <p>Timeline not available</p>
                   </div>
                 )}
@@ -987,60 +987,60 @@ const fetchTasks = async () => {
 
       {/* Task Details Modal */}
       {selectedTask && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2 className="modal-title">{selectedTask.title}</h2>
+        <div className="idp-modal-overlay">
+          <div className="idp-modal-content">
+            <div className="idp-modal-header">
+              <h2 className="idp-modal-title">{selectedTask.title}</h2>
             </div>
-            <div className="modal-body">
-              <div className="modal-section">
-                <div className="form-group">
-                  <label className="form-label">Task Description</label>
-                  <p className="task-description">
+            <div className="idp-modal-body">
+              <div className="idp-modal-section">
+                <div className="idp-form-group">
+                  <label className="idp-form-label">Task Description</label>
+                  <p className="idp-task-description">
                     {selectedTask.description || "No description provided"}
                   </p>
                 </div>
 
-                <div className="modal-grid">
-                  <div className="form-group">
-                    <label className="form-label">Due Date</label>
-                    <p className="form-value">{selectedTask.dueDate}</p>
+                <div className="idp-modal-grid">
+                  <div className="idp-form-group">
+                    <label className="idp-form-label">Due Date</label>
+                    <p className="idp-form-value">{selectedTask.dueDate}</p>
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Status</label>
-                    <span className={`status-badge ${getStatusColor(selectedTask.status)}`}>
+                  <div className="idp-form-group">
+                    <label className="idp-form-label">Status</label>
+                    <span className={`idp-status-badge ${getStatusColor(selectedTask.status)}`}>
                       {selectedTask.status}
                     </span>
                   </div>
                 </div>
 
                 {selectedTask.feedback && (
-                  <div className="form-group">
-                    <label className="form-label">Feedback</label>
-                    <p className="feedback-text">{selectedTask.feedback}</p>
+                  <div className="idp-form-group">
+                    <label className="idp-form-label">Feedback</label>
+                    <p className="idp-feedback-text">{selectedTask.feedback}</p>
                   </div>
                 )}
 
                 {selectedTask.status === "Pending" && (
-                  <div className="submission-section">
-                    <h3 className="submission-title">Submit Task</h3>
-                    <div className="submission-form">
-                      <div className="form-group">
-                        <label className="form-label">Submission Text</label>
+                  <div className="idp-submission-section">
+                    <h3 className="idp-submission-title">Submit Task</h3>
+                    <div className="idp-submission-form">
+                      <div className="idp-form-group">
+                        <label className="idp-form-label">Submission Text</label>
                         <textarea
                           value={submissionText}
                           onChange={(e) => setSubmissionText(e.target.value)}
                           rows={4}
-                          className="form-textarea"
+                          className="idp-form-textarea"
                           placeholder="Enter your submission details..."
                         />
                       </div>
-                      <div className="form-group">
-                        <label className="form-label">Upload File (Optional)</label>
+                      <div className="idp-form-group">
+                        <label className="idp-form-label">Upload File (Optional)</label>
                         <input
                           type="file"
                           onChange={(e) => setSubmissionFile(e.target.files[0])}
-                          className="form-file"
+                          className="idp-form-file"
                           accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
                         />
                       </div>
@@ -1049,10 +1049,10 @@ const fetchTasks = async () => {
                 )}
               </div>
             </div>
-            <div className="modal-footer">
+            <div className="idp-modal-footer">
               <button
                 onClick={() => setSelectedTask(null)}
-                className="btn btn-secondary"
+                className="idp-btn idp-btn-secondary"
               >
                 Close
               </button>
@@ -1060,9 +1060,9 @@ const fetchTasks = async () => {
                 <button
                   onClick={() => submitTask(selectedTask.id)}
                   disabled={submitting || !submissionText.trim()}
-                  className="btn btn-primary"
+                  className="idp-btn idp-btn-primary"
                 >
-                  {submitting && <Loader className="btn-spinner" size={16} />}
+                  {submitting && <Loader className="idp-btn-spinner" size={16} />}
                   <span>{submitting ? "Submitting..." : "Submit Task"}</span>
                 </button>
               )}

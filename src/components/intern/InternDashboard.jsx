@@ -38,27 +38,26 @@ const InternDashboard = () => {
   const [submitting, setSubmitting] = useState(false);
 
   // Enhanced API configuration with multiple fallback options
-  const getApiConfig = () => {
-    const isDevelopment = process.env.NODE_ENV === "development";
-    
-    const configs = [
-      // Primary: Proxy in development, direct production URL in production
-      {
-        name: 'Primary',
-        baseUrl: isDevelopment ? '/api' : 'https://hrms-backend-5wau.onrender.com/api',
-        description: isDevelopment ? 'Development proxy' : 'Production server'
-      },
-      // Fallback 1: Always try direct production URL
-      {
-        name: 'Direct Production',
-        baseUrl: 'https://hrms-backend-5wau.onrender.com/api',
-        description: 'Direct production server connection'
-      },
- 
-    ];
+const getApiConfig = () => {
+  const isDevelopment = process.env.NODE_ENV === "development";
+  
+  const configs = [
+    // ✅ FIX: Always use direct production URL first in development
+    {
+      name: 'Direct Production',
+      baseUrl: 'https://hrms-backend-5wau.onrender.com/api',
+      description: 'Direct production server connection'
+    },
+    // Only try proxy as fallback
+    ...(isDevelopment ? [{
+      name: 'Development Proxy',
+      baseUrl: '/api',
+      description: 'Development proxy (fallback)'
+    }] : [])
+  ];
 
-    return configs;
-  };
+  return configs;
+};
 
   // Get token from localStorage
   const getToken = () => {

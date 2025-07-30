@@ -465,13 +465,10 @@ const fetchTasks = async () => {
 
   // Logout
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    if (process.env.NODE_ENV !== 'development') {
-      window.location.href = "/intern/login";
-    } else {
-      alert("Logout clicked (redirect disabled in development)");
-    }
-  };
+  localStorage.removeItem("token");
+  window.location.href = "/intern/login";
+};
+
 
   // Retry all data fetching
   const retryFetchAll = async () => {
@@ -539,11 +536,9 @@ const fetchTasks = async () => {
 
   const navItems = [
     { id: "dashboard", icon: Home, label: "Dashboard" },
-    { id: "profile", icon: User, label: "My Profile" },
     { id: "tasks", icon: FileText, label: "My Tasks" },
     { id: "certificates", icon: Trophy, label: "Certificates" },
     { id: "announcements", icon: Bell, label: "Announcements" },
-    { id: "help", icon: HelpCircle, label: "Help & Support" },
     { id: "logout", icon: LogOut, label: "Logout" },
   ];
 

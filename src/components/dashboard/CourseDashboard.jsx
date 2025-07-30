@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronRight, Clock, Users, Award, X, Loader } from 'lucide-react';
 import "./CourseDashboard1.css"
 import logo from "../../assets/logo1.png"
+import Footer from './Footer';
 
 const CourseDashboard = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -400,24 +401,7 @@ const CourseDashboard = () => {
       )}
 
       {/* Footer */}
-      <footer className="dashboard-footer">
-        <div className="footer-content">
-          <div className="footer-section">
-            <h4>Why Choose Us?</h4>
-            <ul>
-              <li>✓ Placement Support for Top Performers</li>
-              <li>✓ Internship Certificate</li>
-              <li>✓ Real-Time Project Experience</li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h4>Contact Info</h4>
-            <p>📞 9095422237</p>
-            <p>🌐 thevsoft.com</p>
-            <p>📍 Vamanapatrai, Tirunelveli</p>
-          </div>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 };

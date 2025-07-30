@@ -628,7 +628,7 @@ const fetchTasks = async () => {
         <div className="idp-sidebar-header">
           <h2 className="idp-sidebar-title">Intern Portal</h2>
           <div className="idp-sidebar-status">
-            <ConnectionStatus />
+            {/* <ConnectionStatus /> */}
           </div>
         </div>
         <nav className="idp-sidebar-nav">
@@ -894,48 +894,6 @@ const fetchTasks = async () => {
                     <span>📧</span>
                     <span>info@thevsoft.com</span>
                   </a>
-                  <button className="idp-live-chat-button">
-                    <MessageCircle size={16} />
-                    <span>Live Chat</span>
-                  </button>
-                  
-                  {process.env.NODE_ENV === 'development' && (
-                    <div className="idp-debug-section">
-                      <h4>🔧 Debug Actions</h4>
-                      <div className="idp-debug-actions">
-                        <button
-                          onClick={testConnection}
-                          className="idp-debug-button idp-debug-test"
-                        >
-                          Test Connection
-                        </button>
-                        <button
-                          onClick={() => {
-                            console.log('Current State:', {
-                              internData,
-                              tasks,
-                              announcements,
-                              timelineSteps,
-                              connectionStatus,
-                              error
-                            });
-                          }}
-                          className="idp-debug-button idp-debug-log"
-                        >
-                          Log State
-                        </button>
-                        <button
-                          onClick={() => {
-                            localStorage.clear();
-                            window.location.reload();
-                          }}
-                          className="idp-debug-button idp-debug-clear"
-                        >
-                          Clear Storage & Reload
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

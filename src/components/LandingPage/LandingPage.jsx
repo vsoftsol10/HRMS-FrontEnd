@@ -67,11 +67,7 @@ const LandingPage = () => {
   return (
     <div className="landing-container">
       <div className="left-section">
-        <div className="logo-section">
-          <div className="logo-container">
-            <img src={logo} alt="VSoft Solutions Logo" className="logo-image" />
-          </div>
-        </div>
+
         
         <div className="welcome-content">
           <h1>Welcome to VSoft Solutions</h1>
@@ -80,6 +76,11 @@ const LandingPage = () => {
       </div>
 
       <div className="right-section">
+      <div className="landing-logo-section">
+          <div className="landing-logo-container">
+            <img src={logo} alt="VSoft Solutions Logo" className="landing-logo-image" />
+          </div>
+        </div>
         <div className="portal-section">
           <h2>Choose Your Portal</h2>
           

@@ -49,18 +49,21 @@ body {
   }
 }
 
-.logo-section {
+.landing-logo-section {
   position: absolute;
   top: 40px;
-  left: 40px;
+  right: 40px;
   z-index: 2;
+  display: flex;
+  align-items: right;
+  justify-content: right;
 }
 
-.logo-container {
+.landing-logo-container {
   width: 180px;
   height: 80px;
-  background: rgb(255, 255, 255);
-  border-radius: 15px;
+  background: linear-gradient(45deg, transparent 50%, rgba(139, 77, 158, 0.05) 100%, transparent 100%);
+  /* border-radius: 5px; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,15 +71,16 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 10px;
   transition: all 0.3s ease;
+  /* box-shadow: 0 0.5px 1.5px rgba(34, 19, 39, 0.4); */
 }
 
-.logo-container:hover {
+.landing-logo-container:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
-.logo-image {
+.landing-logo-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -433,14 +437,14 @@ body {
     align-items: center;
   }
   
-  .logo-section {
+  .landing-logo-section {
     position: relative;
     top: auto;
     left: auto;
     margin-bottom: 30px;
   }
   
-  .logo-container {
+  .landing-logo-container {
     width: 160px;
     height: 70px;
   }
@@ -475,7 +479,7 @@ body {
     min-height: 40vh;
   }
   
-  .logo-container {
+  .landing-logo-container {
     width: 140px;
     height: 60px;
   }
@@ -508,7 +512,7 @@ body {
 }
 
 @media (max-width: 360px) {
-  .logo-container {
+  .landing-logo-container {
     width: 120px;
     height: 50px;
   }

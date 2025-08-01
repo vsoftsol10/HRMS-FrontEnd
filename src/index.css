@@ -2,6 +2,7 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bitter:ital,wght@0,100..900;1,100..900&family=Cinzel:wght@400..900&family=Edu+NSW+ACT+Hand+Pre:wght@400..700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&family=Tagesschrift&display=swap');/* Course Dashboard Styles */
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);

@@ -19,7 +19,7 @@ const AdminLogin = () => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:8080/api/login', {
+      const response = await fetch('https://hrms-backend-5wau.onrender.com/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

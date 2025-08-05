@@ -19,30 +19,59 @@ const AdminLogin = () => {
     setError('');
     
     try {
+      console.log('🚀 Attempting login to:', 'https://hrms-backend-5wau.onrender.com/api/login');
+      
       const response = await fetch('https://hrms-backend-5wau.onrender.com/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           username: loginData.username,
           password: loginData.password
         })
       });
 
-      const data = await response.json();
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
+      // ✅ Better error handling for different response types
+      let data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const textResponse = await response.text();
+        console.error('❌ Non-JSON response:', textResponse);
+        throw new Error('Server returned invalid response format');
+      }
+
+      console.log('📦 Response data:', data);
 
       if (response.ok && data.token) {
         // Store the token
         localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminUser', JSON.stringify(data.user));
         
+        console.log('✅ Login successful, redirecting to dashboard');
         navigate("/admin/dashboard");
       } else {
-        setError(data.message || 'Invalid username or password');
+        setError(data.error || data.message || 'Invalid username or password');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      console.error('❌ Login error:', error);
+      
+      // ✅ Better error messages based on error type
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        setError('Network error. Please check your connection and try again.');
+      } else if (error.message.includes('CORS')) {
+        setError('Server configuration error. Please contact support.');
+      } else if (error.message.includes('invalid response format')) {
+        setError('Server error. Please try again later.');
+      } else {
+        setError(error.message || 'An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

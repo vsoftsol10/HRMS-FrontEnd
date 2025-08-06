@@ -4,6 +4,7 @@ import {
   Download, FileText, Video, Link, Search, BarChart3, TrendingUp, Clock, Plus, RefreshCw, AlertCircle, 
   X, Bell, Settings, LogOut
 } from 'lucide-react';
+import "./AdminIntern.css"
 
 const AdminIntern = () => {
   // State management
@@ -32,7 +33,7 @@ const AdminIntern = () => {
     attendance: { intern_id: '', date: new Date().toISOString().split('T')[0], status: 'present', check_in_time: '', check_out_time: '', notes: '' }
   });
 
-  const API_BASE_URL = 'http://localhost:8080/api';
+  const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com';
   const getAuthToken = () => localStorage.getItem('adminToken');
 
   // API helper

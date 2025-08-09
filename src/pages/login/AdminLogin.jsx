@@ -19,9 +19,9 @@ const AdminLogin = () => {
     setError('');
     
     try {
-      console.log('🚀 Attempting login to:', 'https://hrms-backend-5wau.onrender.com/api/login');
+      console.log('🚀 Attempting login to:', 'https://hrms-backend-5wau.onrender.com/api/admin/login');
       
-      const response = await fetch('https://hrms-backend-5wau.onrender.com/api/login', {
+      const response = await fetch('https://hrms-backend-5wau.onrender.com/api/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

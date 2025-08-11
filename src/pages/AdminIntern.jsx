@@ -1,94 +1,48 @@
 import React, { useState, useEffect } from "react";
 import {
-  Users,
-  CheckCircle,
-  XCircle,
-  UserCheck,
-  UserX,
-  ClipboardList,
-  Upload,
-  Calendar,
-  Award,
-  Eye,
-  Edit,
-  Trash2,
-  Download,
-  FileText,
-  Video,
-  Link,
-  Search,
-  BarChart3,
-  TrendingUp,
-  Clock,
-  Plus,
-  RefreshCw,
-  AlertCircle,
-  X,
-  Bell,
-  Settings,
-  LogOut,
+  Users, CheckCircle, XCircle, UserCheck, UserX, ClipboardList,
+  Upload, Calendar, Award, Edit, Trash2, Search, BarChart3,
+  TrendingUp, Clock, Plus, RefreshCw, AlertCircle, X, Bell,
+  Settings, LogOut,
 } from "lucide-react";
 import "./AdminIntern.css";
 import { useNavigate } from "react-router-dom";
 
 const AdminIntern = () => {
-  // State management
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const navigate=useNavigate();
-
+  
   const [data, setData] = useState({
     stats: {
-      totalInterns: 0,
-      pendingApprovals: 0,
-      activeInterns: 0,
-      completedInterns: 0,
-      avgProgress: 0,
+      totalInterns: 0, pendingApprovals: 0, activeInterns: 0,
+      completedInterns: 0, avgProgress: 0
     },
-    interns: [],
-    tasks: [],
-    resources: [],
-    attendance: [],
-    certificates: [],
-    batches: [],
-    activities: [],
+    interns: [], tasks: [], resources: [], 
+    attendance: [], certificates: [], batches: [], activities: []
   });
 
   const [filters, setFilters] = useState({
-    searchTerm: "",
-    filterStatus: "all",
-    currentPage: 1,
-    totalPages: 1,
+    searchTerm: "", filterStatus: "all", currentPage: 1, totalPages: 1
   });
 
   const [modals, setModals] = useState({
-    showTaskModal: false,
-    showResourceModal: false,
-    showAttendanceModal: false,
-    editingTask: null,
-    editingIntern: null,
+    showTaskModal: false, showResourceModal: false, showAttendanceModal: false,
+    editingTask: null, editingIntern: null
   });
 
   const [forms, setForms] = useState({
     task: { title: "", description: "", assigned_to: "", due_date: "" },
     resource: {
-      title: "",
-      description: "",
-      type: "pdf",
-      batch: "All Batches",
-      external_url: "",
-      file: null,
+      title: "", description: "", type: "pdf", batch: "All Batches",
+      external_url: "", file: null
     },
     attendance: {
-      intern_id: "",
-      date: new Date().toISOString().split("T")[0],
-      status: "present",
-      check_in_time: "",
-      check_out_time: "",
-      notes: "",
-    },
+      intern_id: "", date: new Date().toISOString().split("T")[0],
+      status: "present", check_in_time: "", check_out_time: "", notes: ""
+    }
   });
 
   const API_BASE_URL = "https://hrms-backend-5wau.onrender.com";
@@ -101,14 +55,14 @@ const AdminIntern = () => {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
+        ...options.headers
+      }
     };
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...defaultOptions,
-      ...options,
+      ...defaultOptions, ...options
     });
+    
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "API call failed");
@@ -120,10 +74,7 @@ const AdminIntern = () => {
   const loadData = async (endpoints) => {
     try {
       setLoading(true);
-      const results = await Promise.all(
-        endpoints.map((endpoint) => apiCall(endpoint))
-      );
-      return results;
+      return await Promise.all(endpoints.map(endpoint => apiCall(endpoint)));
     } catch (err) {
       setError("Failed to load data: " + err.message);
       return [];
@@ -136,12 +87,12 @@ const AdminIntern = () => {
   const loadDashboardData = async () => {
     const [statsData, activitiesData] = await loadData([
       "/api/admin/dashboard/stats",
-      "/api/admin/dashboard/activities",
+      "/api/admin/dashboard/activities"
     ]);
-    setData((prev) => ({
+    setData(prev => ({
       ...prev,
       stats: statsData || prev.stats,
-      activities: activitiesData?.activities || [],
+      activities: activitiesData?.activities || []
     }));
   };
 
@@ -150,11 +101,12 @@ const AdminIntern = () => {
       page: filters.currentPage,
       limit: 10,
       ...(filters.searchTerm && { search: filters.searchTerm }),
-      ...(filters.filterStatus !== "all" && { status: filters.filterStatus }),
+      ...(filters.filterStatus !== "all" && { status: filters.filterStatus })
     });
+    
     const [result] = await loadData([`/api/admin/interns?${params}`]);
-    setData((prev) => ({ ...prev, interns: result?.interns || [] }));
-    setFilters((prev) => ({ ...prev, totalPages: result?.totalPages || 1 }));
+    setData(prev => ({ ...prev, interns: result?.interns || [] }));
+    setFilters(prev => ({ ...prev, totalPages: result?.totalPages || 1 }));
   };
 
   const loadOtherData = async (type) => {
@@ -163,10 +115,11 @@ const AdminIntern = () => {
       resources: ["/api/admin/resources"],
       attendance: ["/api/admin/attendance"],
       certificates: ["/api/admin/certificates"],
-      batches: ["/api/admin/batches"],
+      batches: ["/api/admin/batches"]
     };
+    
     const [result] = await loadData(endpoints[type] || []);
-    setData((prev) => ({ ...prev, [type]: result || [] }));
+    setData(prev => ({ ...prev, [type]: result || [] }));
   };
 
   // CRUD operations
@@ -174,7 +127,7 @@ const AdminIntern = () => {
     try {
       await apiCall(`/api/admin/interns/${id}/status`, {
         method: "PUT",
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status })
       });
       setSuccess(`Intern status updated to ${status}`);
       loadInterns();
@@ -187,11 +140,9 @@ const AdminIntern = () => {
   const handleFormSubmit = async (type, isEdit = false) => {
     try {
       const endpoints = {
-        task: isEdit
-          ? `/api/admin/tasks/${modals.editingTask.id}`
-          : "/api/admin/tasks",
+        task: isEdit ? `/api/admin/tasks/${modals.editingTask.id}` : "/api/admin/tasks",
         resource: "/api/admin/resources",
-        attendance: "/api/admin/attendance",
+        attendance: "/api/admin/attendance"
       };
 
       let body = forms[type];
@@ -199,8 +150,8 @@ const AdminIntern = () => {
 
       if (type === "resource") {
         const formData = new FormData();
-        Object.keys(body).forEach((key) => {
-          if (body[key] !== null && body[key] !== "")
+        Object.keys(body).forEach(key => {
+          if (body[key] !== null && body[key] !== "") 
             formData.append(key, body[key]);
         });
         body = formData;
@@ -212,32 +163,28 @@ const AdminIntern = () => {
       await apiCall(endpoints[type], {
         method: isEdit ? "PUT" : "POST",
         headers,
-        body,
+        body
       });
 
       setSuccess(`${type} ${isEdit ? "updated" : "created"} successfully`);
-      setModals((prev) => ({
+      setModals(prev => ({
         ...prev,
         [`show${type.charAt(0).toUpperCase() + type.slice(1)}Modal`]: false,
-        editingTask: null,
+        editingTask: null
       }));
-      setForms((prev) => ({
+      
+      setForms(prev => ({
         ...prev,
-        [type]:
-          type === "task"
-            ? { title: "", description: "", assigned_to: "", due_date: "" }
-            : prev[type],
+        [type]: type === "task" 
+          ? { title: "", description: "", assigned_to: "", due_date: "" }
+          : prev[type]
       }));
+      
       loadOtherData(type + "s");
     } catch (err) {
-      setError(
-        `Failed to ${isEdit ? "update" : "create"} ${type}: ` + err.message
-      );
+      setError(`Failed to ${isEdit ? "update" : "create"} ${type}: ${err.message}`);
     }
   };
-  const handleLogout=()=>{
-    navigate("/admin/dashboard")
-  }
 
   const deleteTask = async (id) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
@@ -265,31 +212,15 @@ const AdminIntern = () => {
   useEffect(() => {
     const loadActions = {
       dashboard: loadDashboardData,
-      interns: () => {
-        loadInterns();
-        loadOtherData("batches");
-      },
-      tasks: () => {
-        loadOtherData("tasks");
-        loadInterns();
-      },
-      resources: () => {
-        loadOtherData("resources");
-        loadOtherData("batches");
-      },
-      attendance: () => {
-        loadOtherData("attendance");
-        loadInterns();
-      },
-      certificates: () => loadOtherData("certificates"),
+      interns: () => { loadInterns(); loadOtherData("batches"); },
+      tasks: () => { loadOtherData("tasks"); loadInterns(); },
+      resources: () => { loadOtherData("resources"); loadOtherData("batches"); },
+      attendance: () => { loadOtherData("attendance"); loadInterns(); },
+      certificates: () => loadOtherData("certificates")
     };
+    
     loadActions[activeTab]?.();
-  }, [
-    activeTab,
-    filters.currentPage,
-    filters.searchTerm,
-    filters.filterStatus,
-  ]);
+  }, [activeTab, filters.currentPage, filters.searchTerm, filters.filterStatus]);
 
   // Clear messages
   useEffect(() => {
@@ -303,23 +234,13 @@ const AdminIntern = () => {
   }, [error, success]);
 
   // Utility functions
-  const getStatusColor = (status) =>
-    ({
-      pending: "#ff9800",
-      active: "#4caf50",
-      completed: "#2196f3",
-      rejected: "#f44336",
-      inactive: "#9e9e9e",
-    }[status] || "#9e9e9e");
-  const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
-  const formatTime = (timeString) =>
-    timeString
-      ? new Date(`2000-01-01T${timeString}`).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "";
-
+  const getStatusColor = status => ({
+    pending: "#ac84a4", active: "#80407c", completed: "#ac84a4",
+    rejected: "#8f8e8e", inactive: "#8f8e8e"
+  }[status] || "#8f8e8e");
+  
+  const formatDate = dateString => new Date(dateString).toLocaleDateString();
+  
   // Component builders
   const buildStatCard = (icon, count, label, colorClass) => (
     <div className="aim-stat-card">
@@ -336,37 +257,33 @@ const AdminIntern = () => {
   const buildActionButton = (onClick, variant, size, icon, text) => (
     <button
       onClick={onClick}
-      className={`aim-btn aim-btn--${variant} ${
-        size ? `aim-btn--${size}` : ""
-      }`}
+      className={`aim-btn aim-btn--${variant} ${size ? `aim-btn--${size}` : ""}`}
     >
-      {icon}
-      {text}
+      {icon} {text}
     </button>
   );
 
-  const buildModal = (title, isOpen, onClose, children, onSubmit, submitText) =>
-    isOpen && (
-      <div className="aim-modal-overlay">
-        <div className="aim-modal">
-          <div className="aim-modal-header">
-            <h3 className="aim-modal-title">{title}</h3>
-            <button onClick={onClose} className="aim-modal-close">
-              <X className="aim-icon-sm" />
-            </button>
-          </div>
-          <div className="aim-modal-body">{children}</div>
-          <div className="aim-modal-actions">
-            <button onClick={onSubmit} className="aim-btn aim-btn--primary">
-              {submitText}
-            </button>
-            <button onClick={onClose} className="aim-btn aim-btn--secondary">
-              Cancel
-            </button>
-          </div>
+  const buildModal = (title, isOpen, onClose, children, onSubmit, submitText) => isOpen && (
+    <div className="aim-modal-overlay">
+      <div className="aim-modal">
+        <div className="aim-modal-header">
+          <h3 className="aim-modal-title">{title}</h3>
+          <button onClick={onClose} className="aim-modal-close">
+            <X className="aim-icon-sm" />
+          </button>
+        </div>
+        <div className="aim-modal-body">{children}</div>
+        <div className="aim-modal-actions">
+          <button onClick={onSubmit} className="aim-btn aim-btn--primary">
+            {submitText}
+          </button>
+          <button onClick={onClose} className="aim-btn aim-btn--secondary">
+            Cancel
+          </button>
         </div>
       </div>
-    );
+    </div>
+  );
 
   const buildFormGroup = (label, children) => (
     <div className="aim-form-group">
@@ -379,36 +296,11 @@ const AdminIntern = () => {
   const renderDashboard = () => (
     <div className="aim-dashboard">
       <div className="aim-stats-grid">
-        {buildStatCard(
-          <Users className="aim-icon" />,
-          data.stats.totalInterns,
-          "Total Interns",
-          "aim-stat-icon--blue"
-        )}
-        {buildStatCard(
-          <Clock className="aim-icon" />,
-          data.stats.pendingApprovals,
-          "Pending Approvals",
-          "aim-stat-icon--orange"
-        )}
-        {buildStatCard(
-          <UserCheck className="aim-icon" />,
-          data.stats.activeInterns,
-          "Active Interns",
-          "aim-stat-icon--green"
-        )}
-        {buildStatCard(
-          <Award className="aim-icon" />,
-          data.stats.completedInterns,
-          "Completed",
-          "aim-stat-icon--purple"
-        )}
-        {buildStatCard(
-          <TrendingUp className="aim-icon" />,
-          `${data.stats.avgProgress}%`,
-          "Avg Progress",
-          "aim-stat-icon--indigo"
-        )}
+        {buildStatCard(<Users className="aim-icon" />, data.stats.totalInterns, "Total Interns", "aim-stat-icon--purple")}
+        {buildStatCard(<Clock className="aim-icon" />, data.stats.pendingApprovals, "Pending Approvals", "aim-stat-icon--lavender")}
+        {buildStatCard(<UserCheck className="aim-icon" />, data.stats.activeInterns, "Active Interns", "aim-stat-icon--deep-purple")}
+        {buildStatCard(<Award className="aim-icon" />, data.stats.completedInterns, "Completed", "aim-stat-icon--light-purple")}
+        {buildStatCard(<TrendingUp className="aim-icon" />, `${data.stats.avgProgress}%`, "Avg Progress", "aim-stat-icon--gray")}
       </div>
       <div className="aim-card">
         <div className="aim-card-header">
@@ -423,35 +315,26 @@ const AdminIntern = () => {
                 </div>
                 <div className="aim-activity-content">
                   <p className="aim-activity-text">
-                    <span className="aim-activity-user">
-                      {activity.intern_name || "System"}
-                    </span>{" "}
+                    <span className="aim-activity-user">{activity.intern_name || "System"}</span>{" "}
                     {activity.description}
                   </p>
-                  <p className="aim-activity-date">
-                    {formatDate(activity.created_at)}
-                  </p>
+                  <p className="aim-activity-date">{formatDate(activity.created_at)}</p>
                 </div>
               </div>
             ))}
-            {data.activities.length === 0 && (
-              <p className="aim-empty-state">No recent activities</p>
-            )}
+            {data.activities.length === 0 && <p className="aim-empty-state">No recent activities</p>}
           </div>
         </div>
       </div>
     </div>
   );
 
-  const renderInternCard = (intern) => (
+  const renderInternCard = intern => (
     <div key={intern.id} className="aim-intern-card">
       <div className="aim-intern-header">
         <div className="aim-intern-profile">
           <div className="aim-avatar">
-            {intern.full_name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")}
+            {intern.full_name.split(" ").map(n => n[0]).join("")}
           </div>
           <div className="aim-intern-info">
             <h3 className="aim-intern-name">{intern.full_name}</h3>
@@ -459,10 +342,7 @@ const AdminIntern = () => {
             <p className="aim-intern-id">{intern.employee_id}</p>
           </div>
         </div>
-        <span
-          className="aim-status-badge"
-          style={{ backgroundColor: getStatusColor(intern.status) }}
-        >
+        <span className="aim-status-badge" style={{ backgroundColor: getStatusColor(intern.status) }}>
           {intern.status.charAt(0).toUpperCase() + intern.status.slice(1)}
         </span>
       </div>
@@ -472,60 +352,25 @@ const AdminIntern = () => {
           <span>{intern.progress}%</span>
         </div>
         <div className="aim-progress-bar">
-          <div
-            className="aim-progress-fill"
-            style={{ width: `${intern.progress}%` }}
-          ></div>
+          <div className="aim-progress-fill" style={{ width: `${intern.progress}%` }}></div>
         </div>
       </div>
       <div className="aim-intern-details">
-        <p>
-          <span className="aim-detail-label">Batch:</span> {intern.batch}
-        </p>
-        <p>
-          <span className="aim-detail-label">Phone:</span>{" "}
-          {intern.phone || "Not provided"}
-        </p>
-        <p>
-          <span className="aim-detail-label">Start Date:</span>{" "}
-          {intern.start_date ? formatDate(intern.start_date) : "Not set"}
-        </p>
+        <p><span className="aim-detail-label">Batch:</span> {intern.batch}</p>
+        <p><span className="aim-detail-label">Phone:</span> {intern.phone || "Not provided"}</p>
+        <p><span className="aim-detail-label">Start Date:</span> {intern.start_date ? formatDate(intern.start_date) : "Not set"}</p>
       </div>
       <div className="aim-intern-actions">
         {intern.status === "pending" && (
           <>
-            {buildActionButton(
-              () => updateInternStatus(intern.id, "active"),
-              "success",
-              "sm",
-              <CheckCircle className="aim-icon-xs" />,
-              "Approve"
-            )}
-            {buildActionButton(
-              () => updateInternStatus(intern.id, "rejected"),
-              "danger",
-              "sm",
-              <XCircle className="aim-icon-xs" />,
-              "Reject"
-            )}
+            {buildActionButton(() => updateInternStatus(intern.id, "active"), "success", "sm", <CheckCircle className="aim-icon-xs" />, "Approve")}
+            {buildActionButton(() => updateInternStatus(intern.id, "rejected"), "danger", "sm", <XCircle className="aim-icon-xs" />, "Reject")}
           </>
         )}
         {intern.status === "active" && (
           <>
-            {buildActionButton(
-              () => updateInternStatus(intern.id, "completed"),
-              "info",
-              "sm",
-              <Award className="aim-icon-xs" />,
-              "Complete"
-            )}
-            {buildActionButton(
-              () => updateInternStatus(intern.id, "inactive"),
-              "secondary",
-              "sm",
-              <UserX className="aim-icon-xs" />,
-              "Deactivate"
-            )}
+            {buildActionButton(() => updateInternStatus(intern.id, "completed"), "info", "sm", <Award className="aim-icon-xs" />, "Complete")}
+            {buildActionButton(() => updateInternStatus(intern.id, "inactive"), "secondary", "sm", <UserX className="aim-icon-xs" />, "Deactivate")}
           </>
         )}
       </div>
@@ -536,13 +381,7 @@ const AdminIntern = () => {
     <div className="aim-section">
       <div className="aim-section-header">
         <h2 className="aim-section-title">Intern Management</h2>
-        {buildActionButton(
-          () => window.location.reload(),
-          "primary",
-          "",
-          <RefreshCw className="aim-icon-sm" />,
-          "Refresh"
-        )}
+        {buildActionButton(() => window.location.reload(), "primary", "", <RefreshCw className="aim-icon-sm" />, "Refresh")}
       </div>
       <div className="aim-card">
         <div className="aim-card-header">
@@ -553,34 +392,20 @@ const AdminIntern = () => {
                 type="text"
                 placeholder="Search interns..."
                 value={filters.searchTerm}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    searchTerm: e.target.value,
-                  }))
-                }
+                onChange={e => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
                 className="aim-search-input"
               />
             </div>
             <select
               value={filters.filterStatus}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  filterStatus: e.target.value,
-                }))
-              }
+              onChange={e => setFilters(prev => ({ ...prev, filterStatus: e.target.value }))}
               className="aim-select"
             >
-              {["all", "pending", "active", "completed", "rejected"].map(
-                (status) => (
-                  <option key={status} value={status}>
-                    {status === "all"
-                      ? "All Status"
-                      : status.charAt(0).toUpperCase() + status.slice(1)}
-                  </option>
-                )
-              )}
+              {["all", "pending", "active", "completed", "rejected"].map(status => (
+                <option key={status} value={status}>
+                  {status === "all" ? "All Status" : status.charAt(0).toUpperCase() + status.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -597,30 +422,15 @@ const AdminIntern = () => {
             {filters.totalPages > 1 && (
               <div className="aim-pagination">
                 <button
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      currentPage: Math.max(1, prev.currentPage - 1),
-                    }))
-                  }
+                  onClick={() => setFilters(prev => ({ ...prev, currentPage: Math.max(1, prev.currentPage - 1) }))}
                   disabled={filters.currentPage === 1}
                   className="aim-btn aim-btn--light"
                 >
                   Previous
                 </button>
-                <span className="aim-page-info">
-                  {filters.currentPage} of {filters.totalPages}
-                </span>
+                <span className="aim-page-info">{filters.currentPage} of {filters.totalPages}</span>
                 <button
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      currentPage: Math.min(
-                        filters.totalPages,
-                        prev.currentPage + 1
-                      ),
-                    }))
-                  }
+                  onClick={() => setFilters(prev => ({ ...prev, currentPage: Math.min(filters.totalPages, prev.currentPage + 1) }))}
                   disabled={filters.currentPage === filters.totalPages}
                   className="aim-btn aim-btn--light"
                 >
@@ -638,13 +448,7 @@ const AdminIntern = () => {
     <div className="aim-section">
       <div className="aim-section-header">
         <h2 className="aim-section-title">Task Management</h2>
-        {buildActionButton(
-          () => setModals((prev) => ({ ...prev, showTaskModal: true })),
-          "primary",
-          "",
-          <Plus className="aim-icon-sm" />,
-          "Create Task"
-        )}
+        {buildActionButton(() => setModals(prev => ({ ...prev, showTaskModal: true })), "primary", "", <Plus className="aim-icon-sm" />, "Create Task")}
       </div>
       <div className="aim-card">
         <div className="aim-card-body">
@@ -655,67 +459,40 @@ const AdminIntern = () => {
             </div>
           ) : (
             <div className="aim-tasks">
-              {data.tasks.map((task) => (
+              {data.tasks.map(task => (
                 <div key={task.id} className="aim-task-card">
                   <div className="aim-task-header">
                     <h3 className="aim-task-title">{task.title}</h3>
-                    <span
-                      className={`aim-task-status aim-task-status--${task.status.replace(
-                        "_",
-                        "-"
-                      )}`}
-                    >
-                      {task.status.replace("_", " ").charAt(0).toUpperCase() +
-                        task.status.replace("_", " ").slice(1)}
+                    <span className={`aim-task-status aim-task-status--${task.status.replace("_", "-")}`}>
+                      {task.status.replace("_", " ").charAt(0).toUpperCase() + task.status.replace("_", " ").slice(1)}
                     </span>
                   </div>
                   <p className="aim-task-description">{task.description}</p>
                   <div className="aim-task-info">
-                    <p>
-                      <span className="aim-detail-label">Assigned to:</span>{" "}
-                      {task.assigned_to_name}
-                    </p>
-                    <p>
-                      <span className="aim-detail-label">Due Date:</span>{" "}
-                      {formatDate(task.due_date)}
-                    </p>
+                    <p><span className="aim-detail-label">Assigned to:</span> {task.assigned_to_name}</p>
+                    <p><span className="aim-detail-label">Due Date:</span> {formatDate(task.due_date)}</p>
                   </div>
                   <div className="aim-task-actions">
                     {buildActionButton(
                       () => {
-                        setModals((prev) => ({
-                          ...prev,
-                          editingTask: task,
-                          showTaskModal: true,
-                        }));
-                        setForms((prev) => ({
+                        setModals(prev => ({ ...prev, editingTask: task, showTaskModal: true }));
+                        setForms(prev => ({
                           ...prev,
                           task: {
                             title: task.title,
                             description: task.description,
                             assigned_to: task.assigned_to,
-                            due_date: task.due_date,
-                          },
+                            due_date: task.due_date
+                          }
                         }));
                       },
-                      "info",
-                      "sm",
-                      <Edit className="aim-icon-xs" />,
-                      "Edit"
+                      "info", "sm", <Edit className="aim-icon-xs" />, "Edit"
                     )}
-                    {buildActionButton(
-                      () => deleteTask(task.id),
-                      "danger",
-                      "sm",
-                      <Trash2 className="aim-icon-xs" />,
-                      "Delete"
-                    )}
+                    {buildActionButton(() => deleteTask(task.id), "danger", "sm", <Trash2 className="aim-icon-xs" />, "Delete")}
                   </div>
                 </div>
               ))}
-              {data.tasks.length === 0 && (
-                <p className="aim-empty-state">No tasks found</p>
-              )}
+              {data.tasks.length === 0 && <p className="aim-empty-state">No tasks found</p>}
             </div>
           )}
         </div>
@@ -724,78 +501,45 @@ const AdminIntern = () => {
         modals.editingTask ? "Edit Task" : "Create New Task",
         modals.showTaskModal,
         () => {
-          setModals((prev) => ({
-            ...prev,
-            showTaskModal: false,
-            editingTask: null,
-          }));
-          setForms((prev) => ({
-            ...prev,
-            task: { title: "", description: "", assigned_to: "", due_date: "" },
-          }));
+          setModals(prev => ({ ...prev, showTaskModal: false, editingTask: null }));
+          setForms(prev => ({ ...prev, task: { title: "", description: "", assigned_to: "", due_date: "" } }));
         },
         <>
-          {buildFormGroup(
-            "Title",
+          {buildFormGroup("Title", 
             <input
               type="text"
               value={forms.task.title}
-              onChange={(e) =>
-                setForms((prev) => ({
-                  ...prev,
-                  task: { ...prev.task, title: e.target.value },
-                }))
-              }
+              onChange={e => setForms(prev => ({ ...prev, task: { ...prev.task, title: e.target.value } }))}
               className="aim-input"
             />
           )}
-          {buildFormGroup(
-            "Description",
+          {buildFormGroup("Description",
             <textarea
               value={forms.task.description}
-              onChange={(e) =>
-                setForms((prev) => ({
-                  ...prev,
-                  task: { ...prev.task, description: e.target.value },
-                }))
-              }
+              onChange={e => setForms(prev => ({ ...prev, task: { ...prev.task, description: e.target.value } }))}
               rows={3}
               className="aim-textarea"
             />
           )}
-          {buildFormGroup(
-            "Assign to",
+          {buildFormGroup("Assign to",
             <select
               value={forms.task.assigned_to}
-              onChange={(e) =>
-                setForms((prev) => ({
-                  ...prev,
-                  task: { ...prev.task, assigned_to: e.target.value },
-                }))
-              }
+              onChange={e => setForms(prev => ({ ...prev, task: { ...prev.task, assigned_to: e.target.value } }))}
               className="aim-select"
             >
               <option value="">Select Intern</option>
               {data.interns
-                .filter((intern) => intern.status === "active")
-                .map((intern) => (
-                  <option key={intern.id} value={intern.id}>
-                    {intern.full_name}
-                  </option>
+                .filter(intern => intern.status === "active")
+                .map(intern => (
+                  <option key={intern.id} value={intern.id}>{intern.full_name}</option>
                 ))}
             </select>
           )}
-          {buildFormGroup(
-            "Due Date",
+          {buildFormGroup("Due Date",
             <input
               type="date"
               value={forms.task.due_date}
-              onChange={(e) =>
-                setForms((prev) => ({
-                  ...prev,
-                  task: { ...prev.task, due_date: e.target.value },
-                }))
-              }
+              onChange={e => setForms(prev => ({ ...prev, task: { ...prev.task, due_date: e.target.value } }))}
               className="aim-input"
             />
           )}
@@ -806,13 +550,11 @@ const AdminIntern = () => {
     </div>
   );
 
-  const renderTabContent = () => {
-    const tabs = {
-      dashboard: renderDashboard,
-      interns: renderInternManagement,
-      tasks: renderTaskManagement,
-    };
-    return tabs[activeTab] ? tabs[activeTab]() : renderDashboard();
+  // Main render
+  const tabContent = {
+    dashboard: renderDashboard,
+    interns: renderInternManagement,
+    tasks: renderTaskManagement
   };
 
   return (
@@ -823,20 +565,17 @@ const AdminIntern = () => {
           <div className="aim-alert-content">
             <AlertCircle className="aim-alert-icon" />
             <span className="aim-alert-text">{error}</span>
-            <button onClick={() => setError("")} className="aim-alert-close">
-              <X className="aim-icon-xs" />
-            </button>
+            <button onClick={() => setError("")} className="aim-alert-close"><X className="aim-icon-xs" /></button>
           </div>
         </div>
       )}
+      
       {success && (
         <div className="aim-alert aim-alert--success">
           <div className="aim-alert-content">
             <CheckCircle className="aim-alert-icon" />
             <span className="aim-alert-text">{success}</span>
-            <button onClick={() => setSuccess("")} className="aim-alert-close">
-              <X className="aim-icon-xs" />
-            </button>
+            <button onClick={() => setSuccess("")} className="aim-alert-close"><X className="aim-icon-xs" /></button>
           </div>
         </div>
       )}
@@ -851,6 +590,7 @@ const AdminIntern = () => {
               <span className="aim-user-name">Administrator</span>
             </div>
           </div>
+          
           <nav className="aim-sidebar-nav">
             {[
               { tab: "dashboard", icon: BarChart3, label: "Dashboard" },
@@ -858,27 +598,23 @@ const AdminIntern = () => {
               { tab: "tasks", icon: ClipboardList, label: "Tasks & Updates" },
               { tab: "resources", icon: Upload, label: "Learning Resources" },
               { tab: "attendance", icon: Calendar, label: "Attendance" },
-              { tab: "certificates", icon: Award, label: "Certificates" },
+              { tab: "certificates", icon: Award, label: "Certificates" }
             ].map(({ tab, icon: Icon, label }) => (
               <button
                 key={tab}
-                className={`aim-nav-item ${
-                  activeTab === tab ? "aim-nav-item--active" : ""
-                }`}
+                className={`aim-nav-item ${activeTab === tab ? "aim-nav-item--active" : ""}`}
                 onClick={() => setActiveTab(tab)}
               >
-                <Icon className="aim-nav-icon" />
-                {label}
+                <Icon className="aim-nav-icon" /> {label}
               </button>
             ))}
+            
             <div className="aim-sidebar-footer">
               <button className="aim-sidebar-action">
-                <Settings className="aim-sidebar-action-icon" />
-                Settings
+                <Settings className="aim-sidebar-action-icon" /> Settings
               </button>
-              <button className="aim-sidebar-action" onClick={()=> handleLogout()} >
-                <LogOut className="aim-sidebar-action-icon" />
-                Logout
+              <button className="aim-sidebar-action" onClick={()=>{navigate("/admin/dashboard")}}>
+                <LogOut className="aim-sidebar-action-icon" /> Logout
               </button>
             </div>
           </nav>
@@ -891,9 +627,7 @@ const AdminIntern = () => {
               <h1 className="aim-header-title">Internship Management System</h1>
               <div className="aim-header-actions">
                 <button className="aim-notification-btn">
-                  <span className="aim-notification-badge">
-                    {data.stats.pendingApprovals}
-                  </span>
+                  <span className="aim-notification-badge">{data.stats.pendingApprovals}</span>
                   <Bell className="aim-icon" />
                 </button>
                 <div className="aim-user-profile">
@@ -903,7 +637,10 @@ const AdminIntern = () => {
               </div>
             </div>
           </div>
-          <div className="aim-content">{renderTabContent()}</div>
+          
+          <div className="aim-content">
+            {tabContent[activeTab] ? tabContent[activeTab]() : renderDashboard()}
+          </div>
         </div>
       </div>
     </div>

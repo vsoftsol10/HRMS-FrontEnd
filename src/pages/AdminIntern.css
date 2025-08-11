@@ -16,7 +16,7 @@
 /* Sidebar */
 .aim-sidebar {
   width: 256px;
-  background-color: white;
+  background-color: #80407c;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -24,13 +24,13 @@
 
 .aim-sidebar-header {
   padding: 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .aim-sidebar-title {
   font-size: 20px;
   font-weight: 700;
-  color: #111827;
+  color: white;
   margin: 0 0 16px 0;
 }
 
@@ -43,7 +43,7 @@
 .aim-user-avatar {
   width: 32px;
   height: 32px;
-  background-color: #2563eb;
+  background-color: #ac84a4;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@
 
 .aim-user-name {
   font-size: 14px;
-  color: #6b7280;
+  color: #d8c8d8;
 }
 
 .aim-sidebar-nav {
@@ -73,21 +73,21 @@
   text-align: left;
   background: none;
   border: none;
-  color: #374151;
+  color: #d8c8d8;
   cursor: pointer;
   transition: all 0.2s ease;
   border-right: 2px solid transparent;
 }
 
 .aim-nav-item:hover {
-  background-color: #f9fafb;
-  color: #111827;
+  background-color: #70306c;
+  color: white;
 }
 
 .aim-nav-item--active {
-  background-color: #eff6ff;
-  color: #2563eb;
-  border-right-color: #2563eb;
+  background-color: #70306c;
+  color: white;
+  border-right-color: #d8c8d8;
 }
 
 .aim-nav-icon {
@@ -99,7 +99,7 @@
 .aim-sidebar-footer {
   margin-top: auto;
   padding: 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .aim-sidebar-action {
@@ -110,7 +110,7 @@
   text-align: left;
   background: none;
   border: none;
-  color: #6b7280;
+  color: #d8c8d8;
   cursor: pointer;
   border-radius: 6px;
   transition: all 0.2s ease;
@@ -118,8 +118,8 @@
 }
 
 .aim-sidebar-action:hover {
-  background-color: #f9fafb;
-  color: #111827;
+  background-color: #70306c;
+  color: white;
 }
 
 .aim-sidebar-action-icon {
@@ -133,6 +133,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  background-color: #f5f5f5;
 }
 
 .aim-header {
@@ -151,7 +152,7 @@
 .aim-header-title {
   font-size: 24px;
   font-weight: 700;
-  color: #111827;
+  color: #80407c;
   margin: 0;
 }
 
@@ -166,14 +167,14 @@
   padding: 8px;
   background: none;
   border: none;
-  color: #9ca3af;
+  color: #80407c;
   cursor: pointer;
   transition: color 0.2s ease;
   border-radius: 6px;
 }
 
 .aim-notification-btn:hover {
-  color: #6b7280;
+  color: #70306c;
 }
 
 .aim-notification-badge {
@@ -182,7 +183,7 @@
   right: -4px;
   width: 16px;
   height: 16px;
-  background-color: #ef4444;
+  background-color: #ac84a4;
   color: white;
   font-size: 10px;
   border-radius: 50%;
@@ -215,15 +216,15 @@
 }
 
 .aim-alert--error {
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  background-color: #ffe8e8;
+  border: 1px solid #ffcccc;
+  color: #8f8e8e;
 }
 
 .aim-alert--success {
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #16a34a;
+  background-color: #f0eff4;
+  border: 1px solid #d8c8d8;
+  color: #80407c;
 }
 
 .aim-alert-content {
@@ -253,11 +254,11 @@
 }
 
 .aim-alert--error .aim-alert-close {
-  color: #ef4444;
+  color: #8f8e8e;
 }
 
 .aim-alert--success .aim-alert-close {
-  color: #22c55e;
+  color: #80407c;
 }
 
 /* Common Components */
@@ -276,7 +277,7 @@
 .aim-section-title {
   font-size: 24px;
   font-weight: 700;
-  color: #111827;
+  color: #80407c;
   margin: 0;
 }
 
@@ -295,7 +296,7 @@
 .aim-card-title {
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: #80407c;
   margin: 0;
 }
 
@@ -319,57 +320,57 @@
 }
 
 .aim-btn--primary {
-  background-color: #2563eb;
+  background-color: #80407c;
   color: white;
 }
 
 .aim-btn--primary:hover {
-  background-color: #1d4ed8;
+  background-color: #70306c;
 }
 
 .aim-btn--secondary {
-  background-color: #6b7280;
+  background-color: #8f8e8e;
   color: white;
 }
 
 .aim-btn--secondary:hover {
-  background-color: #4b5563;
+  background-color: #7f7e7e;
 }
 
 .aim-btn--success {
-  background-color: #16a34a;
+  background-color: #ac84a4;
   color: white;
 }
 
 .aim-btn--success:hover {
-  background-color: #15803d;
+  background-color: #9c7494;
 }
 
 .aim-btn--danger {
-  background-color: #dc2626;
+  background-color: #8f8e8e;
   color: white;
 }
 
 .aim-btn--danger:hover {
-  background-color: #b91c1c;
+  background-color: #7f7e7e;
 }
 
 .aim-btn--info {
-  background-color: #2563eb;
+  background-color: #ac84a4;
   color: white;
 }
 
 .aim-btn--info:hover {
-  background-color: #1d4ed8;
+  background-color: #9c7494;
 }
 
 .aim-btn--light {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: #d8c8d8;
+  color: #80407c;
 }
 
 .aim-btn--light:hover {
-  background-color: #e5e7eb;
+  background-color: #c8b8c8;
 }
 
 .aim-btn--sm {
@@ -407,7 +408,7 @@
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: #80407c;
   margin-bottom: 4px;
 }
 
@@ -416,7 +417,7 @@
 .aim-select {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #d8c8d8;
   border-radius: 6px;
   font-size: 14px;
   transition: all 0.2s ease;
@@ -426,8 +427,8 @@
 .aim-textarea:focus,
 .aim-select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-color: #80407c;
+  box-shadow: 0 0 0 3px rgba(128, 64, 124, 0.1);
 }
 
 .aim-textarea {
@@ -461,11 +462,21 @@
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  color: #9ca3af;
+  color: #8f8e8e;
 }
 
 .aim-search-input {
   padding-left: 40px;
+  border: 1px solid #d8c8d8;
+  border-radius: 6px;
+  width: 100%;
+  padding: 8px 12px 8px 40px;
+}
+
+.aim-search-input:focus {
+  outline: none;
+  border-color: #80407c;
+  box-shadow: 0 0 0 3px rgba(128, 64, 124, 0.1);
 }
 
 /* Dashboard */
@@ -499,6 +510,12 @@
   border-radius: 8px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
+  transition: transform 0.2s ease;
+}
+
+.aim-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .aim-stat-content {
@@ -512,36 +529,41 @@
   margin-right: 16px;
 }
 
-.aim-stat-icon--blue {
-  background-color: #dbeafe;
-}
-
-.aim-stat-icon--orange {
-  background-color: #fed7aa;
-}
-
-.aim-stat-icon--green {
-  background-color: #dcfce7;
-}
-
 .aim-stat-icon--purple {
-  background-color: #e9d5ff;
+  background-color: #d8c8d8;
+  color: #80407c;
 }
 
-.aim-stat-icon--indigo {
-  background-color: #e0e7ff;
+.aim-stat-icon--lavender {
+  background-color: #e8d8e8;
+  color: #80407c;
+}
+
+.aim-stat-icon--deep-purple {
+  background-color: #ac84a4;
+  color: white;
+}
+
+.aim-stat-icon--light-purple {
+  background-color: #d8c8d8;
+  color: #80407c;
+}
+
+.aim-stat-icon--gray {
+  background-color: #f0f0f0;
+  color: #8f8e8e;
 }
 
 .aim-stat-number {
   font-size: 24px;
   font-weight: 700;
-  color: #111827;
+  color: #80407c;
   margin: 0 0 4px 0;
 }
 
 .aim-stat-label {
   font-size: 14px;
-  color: #6b7280;
+  color: #8f8e8e;
   margin: 0;
 }
 
@@ -559,9 +581,10 @@
 
 .aim-activity-icon {
   padding: 8px;
-  background-color: #f3f4f6;
+  background-color: #d8c8d8;
   border-radius: 8px;
   flex-shrink: 0;
+  color: #80407c;
 }
 
 .aim-activity-content {
@@ -570,17 +593,18 @@
 
 .aim-activity-text {
   font-size: 14px;
-  color: #111827;
+  color: #8f8e8e;
   margin: 0 0 4px 0;
 }
 
 .aim-activity-user {
   font-weight: 500;
+  color: #80407c;
 }
 
 .aim-activity-date {
   font-size: 12px;
-  color: #6b7280;
+  color: #8f8e8e;
   margin: 0;
 }
 
@@ -604,10 +628,16 @@
 }
 
 .aim-intern-card {
-  background-color: #f9fafb;
+  background-color: white;
   padding: 24px;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d8c8d8;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aim-intern-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .aim-intern-header {
@@ -625,7 +655,7 @@
 .aim-avatar {
   width: 48px;
   height: 48px;
-  background-color: #2563eb;
+  background-color: #80407c;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -641,20 +671,20 @@
 
 .aim-intern-name {
   font-weight: 600;
-  color: #111827;
+  color: #80407c;
   margin: 0 0 4px 0;
   font-size: 16px;
 }
 
 .aim-intern-email {
   font-size: 14px;
-  color: #6b7280;
+  color: #8f8e8e;
   margin: 0 0 2px 0;
 }
 
 .aim-intern-id {
   font-size: 12px;
-  color: #9ca3af;
+  color: #8f8e8e;
   margin: 0;
 }
 
@@ -675,17 +705,18 @@
   justify-content: space-between;
   font-size: 14px;
   margin-bottom: 4px;
+  color: #80407c;
 }
 
 .aim-progress-bar {
   width: 100%;
-  background-color: #e5e7eb;
+  background-color: #d8c8d8;
   border-radius: 9999px;
   height: 8px;
 }
 
 .aim-progress-fill {
-  background-color: #2563eb;
+  background-color: #80407c;
   height: 8px;
   border-radius: 9999px;
   transition: width 0.3s ease;
@@ -693,7 +724,7 @@
 
 .aim-intern-details {
   font-size: 14px;
-  color: #6b7280;
+  color: #8f8e8e;
   margin-bottom: 16px;
 }
 
@@ -703,6 +734,7 @@
 
 .aim-detail-label {
   font-weight: 500;
+  color: #80407c;
 }
 
 .aim-intern-actions {
@@ -719,9 +751,16 @@
 }
 
 .aim-task-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d8c8d8;
   border-radius: 8px;
   padding: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: white;
+}
+
+.aim-task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .aim-task-header {
@@ -733,7 +772,7 @@
 
 .aim-task-title {
   font-weight: 600;
-  color: #111827;
+  color: #80407c;
   margin: 0;
   font-size: 16px;
 }
@@ -746,27 +785,27 @@
 }
 
 .aim-task-status--completed {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: #d8c8d8;
+  color: #80407c;
 }
 
 .aim-task-status--submitted {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: #d8c8d8;
+  color: #80407c;
 }
 
 .aim-task-status--in-progress {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: #ac84a4;
+  color: white;
 }
 
 .aim-task-status--pending {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: #f0f0f0;
+  color: #8f8e8e;
 }
 
 .aim-task-description {
-  color: #6b7280;
+  color: #8f8e8e;
   margin: 0 0 8px 0;
   font-size: 14px;
 }
@@ -776,7 +815,7 @@
   grid-template-columns: 1fr;
   gap: 8px;
   font-size: 14px;
-  color: #6b7280;
+  color: #8f8e8e;
   margin-bottom: 12px;
 }
 
@@ -822,28 +861,28 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #d8c8d8;
 }
 
 .aim-modal-title {
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: #80407c;
   margin: 0;
 }
 
 .aim-modal-close {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: #8f8e8e;
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
 }
 
 .aim-modal-close:hover {
-  color: #6b7280;
-  background-color: #f3f4f6;
+  color: #80407c;
+  background-color: #d8c8d8;
 }
 
 .aim-modal-body {
@@ -852,7 +891,7 @@
 
 .aim-modal-actions {
   padding: 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #d8c8d8;
   display: flex;
   gap: 12px;
 }
@@ -872,7 +911,7 @@
 
 .aim-page-info {
   padding: 8px 16px;
-  background-color: #2563eb;
+  background-color: #80407c;
   color: white;
   border-radius: 6px;
   font-size: 14px;
@@ -889,15 +928,15 @@
 
 .aim-loading-text {
   margin-top: 8px;
-  color: #6b7280;
+  color: #8f8e8e;
   font-size: 14px;
 }
 
 .aim-spinner {
   width: 32px;
   height: 32px;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #2563eb;
+  border: 2px solid #d8c8d8;
+  border-top: 2px solid #80407c;
   border-radius: 50%;
   animation: aim-spin 1s linear infinite;
 }
@@ -910,7 +949,7 @@
 
 /* Empty States */
 .aim-empty-state {
-  color: #6b7280;
+  color: #8f8e8e;
   text-align: center;
   padding: 32px 16px;
   font-size: 14px;

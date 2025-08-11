@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Save, X, Users, DollarSign, Calendar, Building } from 'lucide-react';
+import logo from "../../assets/logo1.png"
 import './PayrollAdmin.css';
 
 const PayrollAdmin = () => {
@@ -239,10 +240,9 @@ const PayrollAdmin = () => {
       <div className="vsoft-payroll-header">
         <div className="vsoft-payroll-header-content">
           <div className="vsoft-payroll-header-left">
-            <Building size={32} />
-            <div>
-              <h1>VSoft Solutions</h1>
-              <p>Payroll Management System</p>
+            {/* <Building size={32} /> */}
+            <div className='logoplaceHolder'>
+              <img src={logo} alt="logo" className='Logo' />
             </div>
           </div>
           <button

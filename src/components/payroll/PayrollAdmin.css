@@ -8,6 +8,27 @@
 }
 
 /* Header Styles */
+
+.logoplaceHolder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  background-color: #fff;
+}
+
+.Logo {
+  max-width: 140px;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.Logo:hover {
+  transform: scale(1.05);
+}
 .vsoft-payroll-header {
   background: linear-gradient(135deg, #80407c 0%, #6d356a 100%);
   color: white;
@@ -447,6 +468,14 @@
     flex-direction: column;
     gap: 16px;
     text-align: center;
+  }
+
+  .logoplaceHolder {
+    padding: 12px 0;
+  }
+  
+  .Logo {
+    max-width: 110px;
   }
   
   .vsoft-payroll-header-left {

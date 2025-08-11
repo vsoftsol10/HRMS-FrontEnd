@@ -29,6 +29,7 @@ import {
   LogOut,
 } from "lucide-react";
 import "./AdminIntern.css";
+import { useNavigate } from "react-router-dom";
 
 const AdminIntern = () => {
   // State management
@@ -36,6 +37,7 @@ const AdminIntern = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate=useNavigate();
 
   const [data, setData] = useState({
     stats: {
@@ -233,6 +235,9 @@ const AdminIntern = () => {
       );
     }
   };
+  const handleLogout=()=>{
+    navigate("/admin/dashboard")
+  }
 
   const deleteTask = async (id) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
@@ -871,7 +876,7 @@ const AdminIntern = () => {
                 <Settings className="aim-sidebar-action-icon" />
                 Settings
               </button>
-              <button className="aim-sidebar-action">
+              <button className="aim-sidebar-action" onClick={()=> handleLogout()} >
                 <LogOut className="aim-sidebar-action-icon" />
                 Logout
               </button>

@@ -14,190 +14,82 @@ const CourseDashboard = () => {
   const API_BASE_URL =  'https://hrms-backend-5wau.onrender.com';
 
   // Fetch courses from backend
-  const fetchCourses = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetch(`${API_BASE_URL}/api/courses`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  // Optimized fetchCourses function with timeout and better error handling
+const fetchCourses = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    const response = await fetch(`${API_BASE_URL}/api/courses`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal
+    });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+    clearTimeout(timeoutId);
 
-      const data = await response.json();
-      
-      if (data.success) {
-        setCourses(data.data);
-      } else {
-        throw new Error(data.message || 'Failed to fetch courses');
-      }
-    } catch (err) {
-      console.error('Error fetching courses:', err);
-      setError(err.message);
-      
-      // Fallback to hardcoded data if API fails
-      const fallbackCourses = [
-        {
-          id: 1,
-          title: "Cloud Computing Basics",
-          cardColor: "linear-gradient(135deg, #4FC3F7 0%, #29B6F6 100%)",
-          platforms: ["AWS", "Azure", "Google Cloud Platform"],
-          description: "Master cloud technologies with hands-on experience across AWS, Azure, and Google Cloud Platform.",
-          duration: "3 months",
-          students: "50+",
-          level: "Intermediate",
-          skillTags: ["EC2", "S3", "+3 more"],
-          courseType: "Internship/Course",
-          topics: [
-            "Basics of GCP",
-            "GCP Virtual Machines & Storage",
-            "Google Cloud Compute Engine",
-            "Cloud Security & Best Practices",
-            "DevOps & CI/CD",
-            "Serverless Architecture"
-          ],
-          features: [
-            "Real-time working experience",
-            "Industry certification preparation",
-            "Placement support for top performers"
-          ]
-        },
-        {
-          id: 2,
-          title: "SAP Basis Administration",
-          cardColor: "linear-gradient(135deg, #AB47BC 0%, #8E24AA 100%)",
-          platforms: ["SAP HANA", "SAP Cloud", "BASIS"],
-          description: "Complete SAP BASIS training with introduction to HANA database administration.",
-          duration: "2 months",
-          students: "50+",
-          level: "Advanced",
-          skillTags: ["SAP Understanding", "BASIS Training", "+3 more"],
-          courseType: "Intermediate",
-          topics: [
-            "Understanding SAP & Cloud",
-            "Complete BASIS training",
-            "Introduction to HANA DB Administration",
-            "System Administration",
-            "Performance Tuning",
-            "Security Management"
-          ],
-          features: [
-            "Hands-on SAP environment",
-            "Real-world scenarios",
-            "Expert instructor guidance"
-          ]
-        },
-        {
-          id: 3,
-          title: "Mobile App Development",
-          cardColor: "linear-gradient(135deg, #66BB6A 0%, #43A047 100%)",
-          platforms: ["Java", "Firebase", "React Native"],
-          description: "Build native and cross-platform mobile applications for both Android and iOS.",
-          duration: "3 months",
-          students: "800+",
-          level: "Beginner to Advanced",
-          skillTags: ["Android", "iOS", "+2 more"],
-          courseType: "Internship/Course",
-          topics: [
-            "Firebase Backend Services",
-            "React Native Development",
-            "Native Android Development",
-            "iOS Development Basics",
-            "App Store Deployment"
-          ],
-          features: [
-            "Build 1+ complete apps",
-            "App store publication guidance",
-            "Industry mentorship"
-          ]
-        },
-        {
-          id: 4,
-          title: "Full Stack Web Development",
-          cardColor: "linear-gradient(135deg, #FF7043 0%, #F4511E 100%)",
-          platforms: ["HTML & CSS", "JavaScript", "React", "Node.js"],
-          description: "Complete web development bootcamp covering frontend and backend technologies.",
-          duration: "3 months",
-          students: "1000+",
-          level: "Beginner to Advanced",
-          skillTags: ["React", "Node.js", "+4 more"],
-          courseType: "Internship/Course",
-          topics: [
-            "HTML5 & CSS3 Fundamentals",
-            "Modern JavaScript (ES6+)",
-            "React.js & Component Architecture",
-            "Node.js & Express.js",
-            "Database Integration",
-            "API Development & Testing"
-          ],
-          features: [
-            "Build complete web applications",
-            "Version control with Git",
-            "Deployment strategies"
-          ]
-        },
-        {
-          id: 5,
-          title: "Digital Marketing",
-          cardColor: "linear-gradient(135deg, #7986CB 0%, #5C6BC0 100%)",
-          platforms: ["Social Media", "Google Ads", "WhatsApp Marketing"],
-          description: "Master digital marketing strategies across multiple platforms and channels.",
-          duration: "2 months",
-          students: "600+",
-          level: "Beginner",
-          skillTags: ["SEO", "PPC", "+5 more"],
-          courseType: "Intermediate",
-          topics: [
-            "Social Media Marketing",
-            "Google Ads & PPC Campaigns",
-            "WhatsApp Business Marketing",
-            "Content Strategy",
-            "Analytics & Reporting",
-            "SEO Fundamentals"
-          ],
-          features: [
-            "Live campaign management",
-            "Industry case studies",
-            "Certification preparation"
-          ]
-        },
-        {
-          id: 6,
-          title: "Graphic Designing",
-          cardColor: "linear-gradient(135deg, #EC407A 0%, #E91E63 100%)",
-          platforms: ["Canva Premium", "Figma"],
-          description: "Create stunning designs for all industries using professional design tools.",
-          duration: "1 months",
-          students: "400+",
-          level: "Beginner to Intermediate",
-          skillTags: ["Design", "Branding", "+3 more"],
-          courseType: "Internship/Course",
-          topics: [
-            "Canva Premium Features",
-            "Figma Design Principles",
-            "Typography & Color Theory",
-            "Brand Identity Design",
-            "Social Media Graphics",
-            "Print Design Basics"
-          ],
-          features: [
-            "Portfolio development",
-            "Industry-specific templates",
-            "Creative project assignments"
-          ]
-        }
-      ];
-      setCourses(fallbackCourses);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
+
+    const data = await response.json();
+    
+    if (data.success) {
+      setCourses(data.data);
+      console.log('✅ Courses loaded from API');
+    } else {
+      throw new Error(data.message || 'Failed to fetch courses');
+    }
+  } catch (err) {
+    console.error('❌ Error fetching courses:', err);
+    
+    if (err.name === 'AbortError') {
+      setError('Request timeout - using offline data');
+    } else {
+      setError(err.message);
+    }
+    
+    // Immediately load fallback data
+    const fallbackCourses = [
+      {
+        id: 1,
+        title: "Cloud Computing Basics",
+        cardColor: "linear-gradient(135deg, #4FC3F7 0%, #29B6F6 100%)",
+        platforms: ["AWS", "Azure", "Google Cloud Platform"],
+        description: "Master cloud technologies with hands-on experience across AWS, Azure, and Google Cloud Platform.",
+        duration: "3 months",
+        students: "50+",
+        level: "Intermediate",
+        skillTags: ["EC2", "S3", "+3 more"],
+        courseType: "Internship/Course",
+        topics: [
+          "Basics of GCP",
+          "GCP Virtual Machines & Storage",
+          "Google Cloud Compute Engine",
+          "Cloud Security & Best Practices",
+          "DevOps & CI/CD",
+          "Serverless Architecture"
+        ],
+        features: [
+          "Real-time working experience",
+          "Industry certification preparation",
+          "Placement support for top performers"
+        ]
+      },
+      // ... rest of your fallback courses
+    ];
+    setCourses(fallbackCourses);
+    console.log('📱 Using fallback course data');
+  } finally {
+    setLoading(false);
+  }
+}; 
 
   // Fetch courses on component mount
   useEffect(() => {

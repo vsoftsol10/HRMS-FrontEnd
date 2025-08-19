@@ -20,7 +20,7 @@ const InternLogin = () => {
   const navigate = useNavigate();
 
 const API_BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:8080' // Use relative URLs in development (proxy will handle it)
+  ? 'https://hrms-backend-5wau.onrender.com' // Use relative URLs in development (proxy will handle it)
   : 'https://hrms-backend-5wau.onrender.com'; 
 
 // In your InternLogin.jsx

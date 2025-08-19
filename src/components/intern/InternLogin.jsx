@@ -19,9 +19,7 @@ const InternLogin = () => {
   });
   const navigate = useNavigate();
 
-const API_BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'https://hrms-backend-5wau.onrender.com' // Use relative URLs in development (proxy will handle it)
-  : 'https://hrms-backend-5wau.onrender.com'; 
+const API_BASE_URL = 'https://hrms-backend-5wau.onrender.com'; 
 
 // In your InternLogin.jsx
 const testCORSConnection = async () => {

@@ -192,7 +192,7 @@ const testCORSConnection = async () => {
   
   try {
     // Define endpoint and payload based on form mode
-    const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/login';
+    const endpoint = isSignUp ? '/api/auth/register' : '/api/auth/login';
     const payload = isSignUp 
       ? {
           fullName: formData.fullName,
